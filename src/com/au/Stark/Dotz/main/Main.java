@@ -30,15 +30,22 @@ public class Main extends BasicGame {
 	   private Animation sprite, up, down, left, right;
 	   // sprite location
 	   private float x = 34f, y = 66f;
+	   // sprite facing
+	   int faceingX = 0;
+	   int faceingY = 0;
+	   // movement speed
+	   float walkSpeed = 0.05f;
+	   float runSpeed = 0.1f;
+	   // misc
+	   float collisionPaddingDistance = 0.1f;
 	   
 	   // Map Collision Data
 	   private boolean[][] blocked;
-	   private static final int SIZE = 32;  // sprite/tile size | collision range (eg, Down = x2 - Cuz x64 in size).
+	   private static final int SIZE = 32;  // tile size | sprite/collision range?
 	   
 	   // Pew Pew Details
 	   Bullet bullet = new Bullet();
-	   int faceingX = 0;
-	   int faceingY = 0;
+	   
 	   
 	   
 	   
@@ -60,7 +67,7 @@ public class Main extends BasicGame {
 	    	//Load Map
 	 	    grassMap = new TiledMap("assets/grassmap.tmx");
 	 	    
-	 	    //Load Sprite
+	 	    //Load Sprite NOTE: can also just have 1 direction and rotate as required ;-) .ROTATE(FLOAT);
 	 	   Image [] movementUp = {new Image("assets/zomb1_UD1.png"), new Image("assets/zomb1_UD2.png"),
 				   new Image("assets/zomb1_UD3.png"), new Image("assets/zomb1_UD4.png"), new Image("assets/zomb1_UD5.png"), 
 				   new Image("assets/zomb1_UD6.png"), new Image("assets/zomb1_UD7.png"), new Image("assets/zomb1_UD8.png")};
@@ -100,7 +107,8 @@ public class Main extends BasicGame {
                 }
 		    }
 	    }
-	 
+	    
+	    // what the hell is this delta for and where is it from!? fps??
 	    @Override
 	    public void update(GameContainer gc, int delta) throws SlickException {
 	    	//Temp Quick ESC	       
@@ -112,10 +120,14 @@ public class Main extends BasicGame {
 	    	if (input.isKeyDown(Input.KEY_UP)) {
 	             sprite = up;
 	             
-	             if (!isBlocked(x, y - delta * 0.1f)) {
+	             if (!isBlocked(x, y - delta * collisionPaddingDistance)) {
 	                 sprite.update(delta);
-	                 // The lower the delta the slower the sprite will animate.
-	                 y -= delta * 0.1f;
+	                 // The lower the delta the slower the sprite will move.
+	                 // LSHIFT to run, sucka!
+	                 if (input.isKeyDown(Input.KEY_LSHIFT))
+	                	 y -= delta * runSpeed;
+	                 else
+	                	 y -= delta * walkSpeed;
 	             }
 	             faceingX = 0;
 	             faceingY = -1;
@@ -124,9 +136,12 @@ public class Main extends BasicGame {
 	         if (input.isKeyDown(Input.KEY_DOWN)) {
 	             sprite = down;
 	             
-	             if (!isBlocked(x, y + SIZE + delta * 0.1f)) {
+	             if (!isBlocked(x, y + SIZE + delta * collisionPaddingDistance)) {
 	                 sprite.update(delta);
-	                 y += delta * 0.1f;
+	                 if (input.isKeyDown(Input.KEY_LSHIFT))
+	                	 y += delta * runSpeed;
+	                 else 
+	                	 y += delta * walkSpeed;
 	             }
 	             faceingX = 0;
 	             faceingY = 1;
@@ -135,9 +150,12 @@ public class Main extends BasicGame {
 	         if (input.isKeyDown(Input.KEY_LEFT)) {
 	             sprite = left;
 	             
-	             if (!isBlocked(x - delta * 0.1f, y)) {
+	             if (!isBlocked(x - delta * collisionPaddingDistance, y)) {
 	                 sprite.update(delta);
-	                 x -= delta * 0.1f;
+	                 if (input.isKeyDown(Input.KEY_LSHIFT))
+	                	 x -= delta * runSpeed;
+	                 else
+	                	 x -= delta * walkSpeed;
 	             }
 	             faceingX = -1;
 	             faceingY = 0;
@@ -146,9 +164,12 @@ public class Main extends BasicGame {
 	         if (input.isKeyDown(Input.KEY_RIGHT)) {
 	             sprite = right;
 	             
-	             if (!isBlocked(x + SIZE + delta * 0.1f, y)) {
+	             if (!isBlocked(x + SIZE + delta * collisionPaddingDistance, y)) {
 	                 sprite.update(delta);
-	                 x += delta * 0.1f;
+	                 if (input.isKeyDown(Input.KEY_LSHIFT))
+	                	 x += delta * runSpeed;
+	                 else
+	                	 x += delta * walkSpeed;
 	             }
 	             faceingX = 1;
 	             faceingY = 0;
