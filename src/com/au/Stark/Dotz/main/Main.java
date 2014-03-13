@@ -175,22 +175,14 @@ public class Main extends BasicGame {
 	             faceingY = 0;
 	         }
 	         
-	         // to make easier, make function, iff key pressed, send in sprite facing.
-	         // spawn pew peww base don sprite faceing, +++++++ in faceing direction, tooo eazy
-	         /*if (sprite == right && input.isKeyDown(Input.KEY_SPACE)) {
-	        	 System.out.println("Should Pew Pew Now");
-	        	 // spawn pew pew bullets
-	        	 // add to group
-	        	 pewX = (int) x +2;
-	        	 pewY = (int) y;
-	         }
-	         // loop through Bullet group
+	         /*loop through Bullet group
 	         //while (int i =0; i < bullet.getlengh(); i++) {
 		         if (pewX != 0 && pewY != 0) // just remove this and update pos.
 		        	 pewX++;*/
 	         if (input.isKeyDown(Input.KEY_SPACE))
-	        	 bullet.createBullet(sprite,(int)x, (int)y, input, (int) faceingX, (int) faceingY);
+	        	 bullet.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
 	         	
+	         // maby send in data about the map to check for bullets hitting walls, or whocares right now.
 	         if (bullet.exists)
 	        	 bullet.update();
 	         
@@ -201,7 +193,7 @@ public class Main extends BasicGame {
 	    public void render(GameContainer gc, Graphics g) throws SlickException {
 	    	// Display Map
 	    	grassMap.render(0, 0);
-	    	// Draw Zombie
+	    	// Draw player
 	    	sprite.draw((int)x, (int)y);
 	    	
 	    	/*// go through Bullet group and update the pews
@@ -211,6 +203,7 @@ public class Main extends BasicGame {
 	    	
 	    }
 	    
+	    // break map into classes, MapFactory(to create map and shit, and Map for the map data itself).
 	    private boolean isBlocked(float x, float y) {
 	    	int xBlock = (int)x / SIZE;
 	        int yBlock = (int)y / SIZE;

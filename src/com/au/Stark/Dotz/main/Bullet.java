@@ -55,7 +55,7 @@ public class Bullet {
 		}
 	}
 	
-	void createBullet(Animation sprite, int x, int y, Input input, int dirX, int dirY) {
+	void createBullet(Animation sprite, int x, int y, int dirX, int dirY) {
 		// to make easier, make function, iff key pressed, send in sprite facing.
         // spawn pew peww base don sprite faceing, +++++++ in faceing direction, tooo eazy
         System.out.println("Should Pew Pew Now");
