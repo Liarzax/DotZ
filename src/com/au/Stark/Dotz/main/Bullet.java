@@ -1,16 +1,13 @@
 package com.au.Stark.Dotz.main;
 
 import org.newdawn.slick.Animation;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.Input;
-import org.newdawn.slick.SlickException;
 
 public class Bullet {
 	
 	// Pew Pew Details
     private Animation pewLR, pewUD;
-    int bulletPosX = 0, bulletPosY = 0;
-    int dirX = 0, dirY = 0;
+    private int bulletPosX = 0, bulletPosY = 0;
+    private int dirX = 0, dirY = 0;
     
 	// type of bullet
 	// damage
@@ -26,7 +23,7 @@ public class Bullet {
 		bulletPosY += (dirY * bulletSpeed);
 	}
 	
-	void render () {
+	public void render () {
 		if (this.dirX != 0 && dirY == 0 )
 			pewLR.draw(bulletPosX, bulletPosY);
 	
@@ -34,13 +31,14 @@ public class Bullet {
 			pewUD.draw(bulletPosX, bulletPosY);
 	}
 	
-	void bulletText(int i) {
-        System.out.println("Should Pew Pew bullet " + i + " Now");
+	/*//Bullet testing
+	public void bulletText(int i) {
+        System.out.println("Should Shot bullet " + i + " Now");
 	}
 	
-	void completeBullet(int i) {
-		System.out.println("Should of Pew Pewed bullet " + i);
-	}
+	public void completeBullet(int i) {
+		System.out.println("Should of Shot bullet " + i);
+	}*/
 
 	public Animation getPewLR() {
 		return pewLR;

@@ -1,7 +1,5 @@
 package com.au.Stark.Dotz.main;
 
-import java.util.LinkedList;
-
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.AppGameContainer;
@@ -25,6 +23,9 @@ public class Main extends BasicGame {
 	   
 	   // Init Map (20x14 Tiles).
 	   private TiledMap grassMap;
+	   // Map Collision Data
+	   private boolean[][] blocked;
+	   private static final int SIZE = 32;  // tile size | sprite/collision range?
 	   
 	   // Init Sprite
 	   private Animation sprite, up, down, left, right;
@@ -38,15 +39,14 @@ public class Main extends BasicGame {
 	   float runSpeed = 0.1f;
 	   // misc
 	   float collisionPaddingDistance = 0.1f;
-	   
-	   // Map Collision Data
-	   private boolean[][] blocked;
-	   private static final int SIZE = 32;  // tile size | sprite/collision range?
+	   // reload shit also need animation
+	   boolean reloading = false;
 	   
 	   // Pew Pew Details
 	   BulletFactory bulletFactory = new BulletFactory();
-	   //Bullet bullet = new Bullet();
 	   
+	   // temp enemy
+	   Entity enemy = new Entity();
 	   
 	   
 	   
@@ -87,13 +87,13 @@ public class Main extends BasicGame {
 		   down = new Animation(movementDown, duration, false);
 		   left = new Animation(movementLeft, duration, false);
 		   right = new Animation(movementRight, duration, false); 
+		   // idle animation?
 		   
-		   // Original orientation of the sprite. It will look right.
+		   // spawn orientation of the sprite. It will look right.
 		   sprite = right;
 		   
 		   // Load Bullet.init/constructor, etc	
 		   bulletFactory.initBulletFactory();
-		   //bullet.initBullet();
 	 	   
 		   // Build Map Collision Array  based on tile properties in the TileD map 
 		   blocked = new boolean[grassMap.getWidth()][grassMap.getHeight()];
@@ -108,6 +108,9 @@ public class Main extends BasicGame {
                     }
                 }
 		    }
+		   
+		   // temp enemy init.
+		   enemy.initEntity(337, 233);
 	    }
 	    
 	    // what the hell is this delta for and where is it from!? fps??
@@ -177,13 +180,36 @@ public class Main extends BasicGame {
 	         }
 	         
 	         // Fire!
-	         if (Keyboard.isKeyDown(Input.KEY_SPACE)) {
+	         if (Keyboard.isKeyDown(Input.KEY_SPACE) && reloading == false) {
 	        	 if (bulletFactory.curBulletFireTimer >= bulletFactory.bulletFireRate) {
 	        		 bulletFactory.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
 	        	 }
 	         }
 	         
+	         // Reload!
+	         if (Keyboard.isKeyDown(Input.KEY_R) && reloading == false) {
+	        	// Reload Sounds
+				System.out.println("Reloading!");
+				reloading = true;
+	         }
+	         if (reloading == true) {
+	        	 bulletFactory.increaseCurReloadTime();
+	        	 System.out.println("Reloading Time = " + bulletFactory.getCurReloadTime());
+	        	 
+	        	 if (bulletFactory.getCurReloadTime() >= bulletFactory.getReloadSpeed()) {
+						bulletFactory.resetCurOnField();
+						bulletFactory.resetCurReloadTime();
+						reloading = false;
+				}
+	         }
+	         
+	         
+	         
+	         
 	         bulletFactory.updateBullets();
+	         
+	         // temp enemy update
+	         enemy.update(delta);
 	         
 	    }
 	 
@@ -193,13 +219,11 @@ public class Main extends BasicGame {
 	    	grassMap.render(0, 0);
 	    	// Draw player
 	    	sprite.draw((int)x, (int)y);
-	    	
-	    	/*// go through Bullet group and update the pews
-	    	//while (int i =0; i < bullet.getlengh(); i++) {
-	    		pewLR.draw(pewX, pewY);*/
-	    	//bullet.render();
+	    	// Draw bullets.
 	    	bulletFactory.renderBullets();
 	    	
+	    	// temp enemy.draw
+	    	enemy.render();
 	    	
 	    }
 	    
