@@ -44,7 +44,8 @@ public class Main extends BasicGame {
 	   private static final int SIZE = 32;  // tile size | sprite/collision range?
 	   
 	   // Pew Pew Details
-	   Bullet bullet = new Bullet();
+	   BulletFactory bulletFactory = new BulletFactory();
+	   //Bullet bullet = new Bullet();
 	   
 	   
 	   
@@ -90,8 +91,9 @@ public class Main extends BasicGame {
 		   // Original orientation of the sprite. It will look right.
 		   sprite = right;
 		   
-		   // Load Bullet.init/constructor, etc		   
-		   bullet.initBullet();
+		   // Load Bullet.init/constructor, etc	
+		   bulletFactory.initBulletFactory();
+		   //bullet.initBullet();
 	 	   
 		   // Build Map Collision Array  based on tile properties in the TileD map 
 		   blocked = new boolean[grassMap.getWidth()][grassMap.getHeight()];
@@ -179,12 +181,32 @@ public class Main extends BasicGame {
 	         //while (int i =0; i < bullet.getlengh(); i++) {
 		         if (pewX != 0 && pewY != 0) // just remove this and update pos.
 		        	 pewX++;*/
-	         if (input.isKeyDown(Input.KEY_SPACE))
-	        	 bullet.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
+	         if (input.isKeyDown(Input.KEY_SPACE)) {
+	        	 //bullet.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
+	        	 bulletFactory.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
+	        	 
+	         }
+	         
+        	 /*if (Keyboard.getEventKeyState()) {
+        		 if ( Keyboard.getEventKey() == Keyboard.KEY_SPACE){
+        			 bulletFactory.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
+        		 }
+        	 }*/
+	         
+	         
+	         
 	         	
 	         // maby send in data about the map to check for bullets hitting walls, or whocares right now.
-	         if (bullet.exists)
-	        	 bullet.update();
+	         /*if (bullet.exists)
+	        	 bullet.update();*/
+	         // update all ye'bullets
+	         /*if (bulletFactory.getCurOnField() > 0) {
+	        	 bulletFactory.updateBullets();
+	         }*/
+	         
+	         /*while (bulletFactory.bullets != null) {
+	        	 bulletFactory.updateBullets();
+	         }*/
 	         
 	         
 	    }
@@ -199,7 +221,9 @@ public class Main extends BasicGame {
 	    	/*// go through Bullet group and update the pews
 	    	//while (int i =0; i < bullet.getlengh(); i++) {
 	    		pewLR.draw(pewX, pewY);*/
-	    	bullet.render();
+	    	//bullet.render();
+	    	bulletFactory.renderBullets();
+	    	
 	    	
 	    }
 	    
