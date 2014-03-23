@@ -117,16 +117,15 @@ public class Main extends BasicGame {
 	    	if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
 	    	   gc.exit();
 	    	
-	    	// Check Player
-	    	Input input = gc.getInput();
-	    	if (input.isKeyDown(Input.KEY_UP)) {
+	    	// Move/Check Player
+	    	if (Keyboard.isKeyDown(Input.KEY_UP)) {
 	             sprite = up;
 	             
 	             if (!isBlocked(x, y - delta * collisionPaddingDistance)) {
 	                 sprite.update(delta);
 	                 // The lower the delta the slower the sprite will move.
 	                 // LSHIFT to run, sucka!
-	                 if (input.isKeyDown(Input.KEY_LSHIFT))
+	                 if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
 	                	 y -= delta * runSpeed;
 	                 else
 	                	 y -= delta * walkSpeed;
@@ -135,12 +134,12 @@ public class Main extends BasicGame {
 	             faceingY = -1;
 	         }
 	    	
-	         if (input.isKeyDown(Input.KEY_DOWN)) {
+	         if (Keyboard.isKeyDown(Input.KEY_DOWN)) {
 	             sprite = down;
 	             
 	             if (!isBlocked(x, y + SIZE + delta * collisionPaddingDistance)) {
 	                 sprite.update(delta);
-	                 if (input.isKeyDown(Input.KEY_LSHIFT))
+	                 if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
 	                	 y += delta * runSpeed;
 	                 else 
 	                	 y += delta * walkSpeed;
@@ -149,12 +148,12 @@ public class Main extends BasicGame {
 	             faceingY = 1;
 	         }
 	         
-	         if (input.isKeyDown(Input.KEY_LEFT)) {
+	         if (Keyboard.isKeyDown(Input.KEY_LEFT)) {
 	             sprite = left;
 	             
 	             if (!isBlocked(x - delta * collisionPaddingDistance, y)) {
 	                 sprite.update(delta);
-	                 if (input.isKeyDown(Input.KEY_LSHIFT))
+	                 if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
 	                	 x -= delta * runSpeed;
 	                 else
 	                	 x -= delta * walkSpeed;
@@ -163,12 +162,12 @@ public class Main extends BasicGame {
 	             faceingY = 0;
 	         }
 	         
-	         if (input.isKeyDown(Input.KEY_RIGHT)) {
+	         if (Keyboard.isKeyDown(Input.KEY_RIGHT)) {
 	             sprite = right;
 	             
 	             if (!isBlocked(x + SIZE + delta * collisionPaddingDistance, y)) {
 	                 sprite.update(delta);
-	                 if (input.isKeyDown(Input.KEY_LSHIFT))
+	                 if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
 	                	 x += delta * runSpeed;
 	                 else
 	                	 x += delta * walkSpeed;
@@ -177,37 +176,14 @@ public class Main extends BasicGame {
 	             faceingY = 0;
 	         }
 	         
-	         /*loop through Bullet group
-	         //while (int i =0; i < bullet.getlengh(); i++) {
-		         if (pewX != 0 && pewY != 0) // just remove this and update pos.
-		        	 pewX++;*/
-	         if (input.isKeyDown(Input.KEY_SPACE)) {
-	        	 //bullet.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
-	        	 bulletFactory.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
-	        	 
+	         // Fire!
+	         if (Keyboard.isKeyDown(Input.KEY_SPACE)) {
+	        	 if (bulletFactory.curBulletFireTimer >= bulletFactory.bulletFireRate) {
+	        		 bulletFactory.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
+	        	 }
 	         }
 	         
-        	 /*if (Keyboard.getEventKeyState()) {
-        		 if ( Keyboard.getEventKey() == Keyboard.KEY_SPACE){
-        			 bulletFactory.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
-        		 }
-        	 }*/
-	         
-	         
-	         
-	         	
-	         // maby send in data about the map to check for bullets hitting walls, or whocares right now.
-	         /*if (bullet.exists)
-	        	 bullet.update();*/
-	         // update all ye'bullets
-	         /*if (bulletFactory.getCurOnField() > 0) {
-	        	 bulletFactory.updateBullets();
-	         }*/
-	         
-	         /*while (bulletFactory.bullets != null) {
-	        	 bulletFactory.updateBullets();
-	         }*/
-	         
+	         bulletFactory.updateBullets();
 	         
 	    }
 	 

@@ -7,11 +7,17 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 public class BulletFactory {
+	// TODO:
+	// When add wepons/guns. Have the guns as seperate class, and it passes in thhe values such as
+	// bullet speed, max bullets, bullet fire rate, etc to the factory to handle firing those specific bullets!
 	
 	// Pew Pew Details
 	int bulletSpeed = 6;
     private Animation pew, pewLR, pewUD;
     
+    // firing speed controller. Possible to use game timer? or timer class?
+    int curBulletFireTimer = 0;
+    int bulletFireRate = 20;
     
     //LinkedList<Bullet> bullets = new LinkedList<Bullet>();
     private int curBulletsOnField = 0;
@@ -43,24 +49,6 @@ public class BulletFactory {
 		// TODO Auto-generated method stub
 		System.out.println("Start Fire!");
 		
-		//Bullet bullet = new Bullet();
-		/*bullet.bulletText();
-		bullet.setPewLR(pewLR);
-		bullet.setPewUD(pewUD);
-		bullet.setBulletPosX(x + (faceingX *2));
-		bullet.setBulletPosY(y + (faceingY *2));
-		bullet.setDirX(faceingX);
-		bullet.setDirY(faceingY);*/
-		
-		/*Bullet bullet = new Bullet();
-		bullet.bulletText(curBulletsOnField);
-		bullet.setPewLR(pewLR);
-		bullet.setPewUD(pewUD);
-		bullet.setBulletPosX(x + (faceingX *2));
-		bullet.setBulletPosY(y + (faceingY *2));
-		bullet.setDirX(faceingX);
-		bullet.setDirY(faceingY);*/
-		
 		if (curBulletsOnField < maxBullets) {
 			bullets[curBulletsOnField] = new Bullet();
 			bullets[curBulletsOnField].bulletText(curBulletsOnField);
@@ -74,40 +62,7 @@ public class BulletFactory {
 			bullets[curBulletsOnField].completeBullet(curBulletsOnField);
 			curBulletsOnField++;
 		}
-		
-		//bullets.add(bullet);
-		/*for (int i = 0; i < curOnField+1 ; i++) {
-			bullets[i] = new Bullet();
-			
-			bullets[i].bulletText(i);
-			bullets[i].setPewLR(pewLR);
-			bullets[i].setPewUD(pewUD);
-			bullets[i].setBulletPosX(x + (faceingX *2));
-			bullets[i].setBulletPosY(y + (faceingY *2));
-			bullets[i].setDirX(faceingX);
-			bullets[i].setDirY(faceingY);
-			
-			bullets[i].completeBullet(i);
-		}*/
-		
-		/*if (curBulletsOnField < maxBullets) {
-			bullets[++curBulletsOnField] = new Bullet();
-			
-			bullets[++curBulletsOnField].bulletText(++curBulletsOnField);
-			bullets[++curBulletsOnField].setPewLR(pewLR);
-			bullets[++curBulletsOnField].setPewUD(pewUD);
-			bullets[++curBulletsOnField].setBulletPosX(x + (faceingX *2));
-			bullets[++curBulletsOnField].setBulletPosY(y + (faceingY *2));
-			bullets[++curBulletsOnField].setDirX(faceingX);
-			bullets[++curBulletsOnField].setDirY(faceingY);
-			
-			bullets[++curBulletsOnField].completeBullet(++curBulletsOnField);
-			curBulletsOnField++;
-			//setCurOnField(getCurOnField() + 1);
-		}*/
-		
-		//bullets.addFirst(bullet); 
-		//return bullet;
+		curBulletFireTimer = 0;
 	}
 
 	public int getCurOnField() {
@@ -119,22 +74,19 @@ public class BulletFactory {
 	}
 
 	public void updateBullets() {
-		// TODO Auto-generated method stub
-		/*while (bullets != null) {
-			((Bullet) bullets.getFirst()).update(bulletSpeed);
-		}*/
 		for (int i = 0; i < curBulletsOnField; i++) {
-			//bullets[i].update(bulletSpeed);
-			bullets[i].bulletPosX += (bullets[i].dirX * bulletSpeed);
-			bullets[i].bulletPosY += (bullets[i].dirY * bulletSpeed);
+			bullets[i].update(bulletSpeed);
+		}
+		
+		if (curBulletFireTimer < bulletFireRate) {
+			curBulletFireTimer++;
+		}
+		else {
+			// Do Nothing / wait for timer before able to fire again.
 		}
 	}
 	
 	public void renderBullets() {
-		// TODO Auto-generated method stub
-		/*while (bullets != null) {
-			((Bullet) bullets.getFirst()).update(bulletSpeed);
-		}*/
 		for (int i = 0; i < curBulletsOnField; i++) {
 			bullets[i].render();
 		}

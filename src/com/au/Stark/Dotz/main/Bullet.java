@@ -12,9 +12,6 @@ public class Bullet {
     int bulletPosX = 0, bulletPosY = 0;
     int dirX = 0, dirY = 0;
     
-	boolean exists = false;
-	int bulletNum = 0;
-	
 	// type of bullet
 	// damage
 	// penetration
@@ -24,28 +21,21 @@ public class Bullet {
 		
 	}
 	
-	/*void update(int bulletSpeed) {
-		
+	public void update(int bulletSpeed) {
 		bulletPosX += (dirX * bulletSpeed);
 		bulletPosY += (dirY * bulletSpeed);
-		
-	}*/
+	}
 	
 	void render () {
-		// go through Bullet group and update the pews
-    	//while (int i =0; i < bullet.getlengh(); i++) {
-		
 		if (this.dirX != 0 && dirY == 0 )
 			pewLR.draw(bulletPosX, bulletPosY);
 	
 		if(this.dirX == 0 && dirY != 0 )
 			pewUD.draw(bulletPosX, bulletPosY);
-		
 	}
 	
 	void bulletText(int i) {
         System.out.println("Should Pew Pew bullet " + i + " Now");
-		//this.exists = true;
 	}
 	
 	void completeBullet(int i) {
@@ -99,9 +89,5 @@ public class Bullet {
 	public void setDirY(int dirY) {
 		this.dirY = dirY;
 	}
-
 	
-	
-	
-
 }
