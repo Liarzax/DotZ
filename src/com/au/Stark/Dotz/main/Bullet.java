@@ -30,15 +30,6 @@ public class Bullet {
 		if(this.dirX == 0 && dirY != 0 )
 			pewUD.draw(bulletPosX, bulletPosY);
 	}
-	
-	/*//Bullet testing
-	public void bulletText(int i) {
-        System.out.println("Should Shot bullet " + i + " Now");
-	}
-	
-	public void completeBullet(int i) {
-		System.out.println("Should of Shot bullet " + i);
-	}*/
 
 	public Animation getPewLR() {
 		return pewLR;

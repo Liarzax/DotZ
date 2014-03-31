@@ -1,7 +1,9 @@
 package com.au.Stark.Dotz.main;
 
+import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 public class BulletFactory {
@@ -73,10 +75,14 @@ public class BulletFactory {
 	public void resetCurOnField() {
 		curBulletsOnField = 0;
 	}
-
-	public void updateBullets() {
+	
+	// TODO: Need to change this into a link list or something, cuz this is limited and retarted!
+	public void updateBullets(MapFactory mapFactory) {
 		for (int i = 0; i < curBulletsOnField; i++) {
-			bullets[i].update(bulletSpeed);
+			if (!mapFactory.isBlocked(bullets[i].getBulletPosX() + bullets[i].getDirX(), bullets[i].getBulletPosY() + bullets[i].getDirY())) {
+				bullets[i].update(bulletSpeed);
+            }
+			//bullets[i].update(bulletSpeed);
 		}
 		
 		if (curBulletFireTimer < bulletFireRate) {

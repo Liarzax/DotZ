@@ -21,11 +21,8 @@ public class Main extends BasicGame {
 	   static String title = "Defence of the Zombopolypse";
 	   static int fpslimit = 60;
 	   
-	   // Init Map (20x14 Tiles).
-	   private TiledMap grassMap;
-	   // Map Collision Data
-	   private boolean[][] blocked;
-	   private static final int SIZE = 32;  // tile size | sprite/collision range?
+	   // Create mapFactory
+	   MapFactory mapFactory = new MapFactory();
 	   
 	   // Init Sprite
 	   private Animation sprite, up, down, left, right;
@@ -66,7 +63,7 @@ public class Main extends BasicGame {
 	    @Override
 	    public void init(GameContainer gc) throws SlickException {
 	    	//Load Map
-	 	    grassMap = new TiledMap("assets/grassmap.tmx");
+	    	mapFactory.init();
 	 	    
 	 	    //Load Sprite NOTE: can also just have 1 direction and rotate as required ;-) .ROTATE(FLOAT);
 	 	   Image [] movementUp = {new Image("assets/zomb1_UD1.png"), new Image("assets/zomb1_UD2.png"),
@@ -94,37 +91,28 @@ public class Main extends BasicGame {
 		   
 		   // Load Bullet.init/constructor, etc	
 		   bulletFactory.initBulletFactory();
-	 	   
-		   // Build Map Collision Array  based on tile properties in the TileD map 
-		   blocked = new boolean[grassMap.getWidth()][grassMap.getHeight()];
-		   for (int xAxis=0;xAxis<grassMap.getWidth(); xAxis++) {
-                
-			   for (int yAxis=0;yAxis<grassMap.getHeight(); yAxis++) {
-                    int tileID = grassMap.getTileId(xAxis, yAxis, 0);
-                    String value = grassMap.getTileProperty(tileID, "blocked", "false");
-                    
-                    if ("true".equals(value)) {
-                        blocked[xAxis][yAxis] = true;
-                    }
-                }
-		    }
 		   
 		   // temp enemy init.
 		   enemy.initEntity(337, 233);
 	    }
 	    
-	    // what the hell is this delta for and where is it from!? fps??
+	    // what the hell is this delta for and where is it from!? fps?? Seconds? MilSeconds? TIMe!?
 	    @Override
 	    public void update(GameContainer gc, int delta) throws SlickException {
-	    	//Temp Quick ESC	       
+	    	//Temp Quick DEBUG STUFF	       
 	    	if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
-	    	   gc.exit();
+	    	    gc.exit();
+	    	// need to slow this down cuz i think when i try and load a map it will explode and try a million times! LOL!
+	    	if (Keyboard.isKeyDown(Keyboard.KEY_LBRACKET))
+	    		mapFactory.loadNextStage();
+	    	if (Keyboard.isKeyDown(Keyboard.KEY_RBRACKET))
+		    	mapFactory.loadPrevStage();
 	    	
 	    	// Move/Check Player
 	    	if (Keyboard.isKeyDown(Input.KEY_UP)) {
 	             sprite = up;
 	             
-	             if (!isBlocked(x, y - delta * collisionPaddingDistance)) {
+	             if (!mapFactory.isBlocked(x, y - delta * collisionPaddingDistance)) {
 	                 sprite.update(delta);
 	                 // The lower the delta the slower the sprite will move.
 	                 // LSHIFT to run, sucka!
@@ -140,7 +128,7 @@ public class Main extends BasicGame {
 	         if (Keyboard.isKeyDown(Input.KEY_DOWN)) {
 	             sprite = down;
 	             
-	             if (!isBlocked(x, y + SIZE + delta * collisionPaddingDistance)) {
+	             if (!mapFactory.isBlocked(x, y + mapFactory.getTileSize() + delta * collisionPaddingDistance)) {
 	                 sprite.update(delta);
 	                 if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
 	                	 y += delta * runSpeed;
@@ -154,7 +142,7 @@ public class Main extends BasicGame {
 	         if (Keyboard.isKeyDown(Input.KEY_LEFT)) {
 	             sprite = left;
 	             
-	             if (!isBlocked(x - delta * collisionPaddingDistance, y)) {
+	             if (!mapFactory.isBlocked(x - delta * collisionPaddingDistance, y)) {
 	                 sprite.update(delta);
 	                 if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
 	                	 x -= delta * runSpeed;
@@ -168,7 +156,7 @@ public class Main extends BasicGame {
 	         if (Keyboard.isKeyDown(Input.KEY_RIGHT)) {
 	             sprite = right;
 	             
-	             if (!isBlocked(x + SIZE + delta * collisionPaddingDistance, y)) {
+	             if (!mapFactory.isBlocked(x + mapFactory.getTileSize() + delta * collisionPaddingDistance, y)) {
 	                 sprite.update(delta);
 	                 if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
 	                	 x += delta * runSpeed;
@@ -206,17 +194,17 @@ public class Main extends BasicGame {
 	         
 	         
 	         
-	         bulletFactory.updateBullets();
+	         bulletFactory.updateBullets(mapFactory);
 	         
 	         // temp enemy update
 	         enemy.update(delta);
 	         
 	    }
 	 
-	    @Override
+	    //@Override
 	    public void render(GameContainer gc, Graphics g) throws SlickException {
 	    	// Display Map
-	    	grassMap.render(0, 0);
+	    	mapFactory.getCurMap().render(0, 0);
 	    	// Draw player
 	    	sprite.draw((int)x, (int)y);
 	    	// Draw bullets.
@@ -226,16 +214,6 @@ public class Main extends BasicGame {
 	    	enemy.render();
 	    	
 	    }
-	    
-	    // break map into classes, MapFactory(to create map and shit, and Map for the map data itself).
-	    private boolean isBlocked(float x, float y) {
-	    	int xBlock = (int)x / SIZE;
-	        int yBlock = (int)y / SIZE;
-	        return blocked[xBlock][yBlock];
-	    }
-	    
-	    
-	   
 	    
 	   
 	}

@@ -74,7 +74,6 @@ public class Entity {
 	void update(int delta) {
 		// TODO: add a thingy where it checks if at dest, create new dest, else move tawords dest.
 		
-		
 		// dest up
 		if (destY < y) {
 			moveUp(delta);
@@ -102,23 +101,6 @@ public class Entity {
 		// TODO: Seems ok, but needs work!
 		// add idle, maby idle timer, idk, something looks like its missing.
 		
-		/*// dest reached
-		if ((int)x == (int)destX && (int)y == (int)destY) {
-			System.out.println("DestX = "+destX+" DestY = "+destY+" Reached!");
-			setNewDestination(mapHeight, mapWidth);
-		}
-        
-		//System.out.println("curX = "+x+" curY = "+y);
-		//System.out.println("DestX = "+destX+" DestY = "+destY);
-		
-		if(pass > 0) {
-			System.out.println("Reduce Speed!");
-			//curWalkSpeed -= 0.005f;
-		}
-		if(pass == 0) {
-			//System.out.println("Return Speed!");
-			curWalkSpeed = walkSpeed;
-		}*/
 		if(pass > 150) {
 			//System.out.println("DestX = "+destX+" DestY = "+destY+" Reached!");
 			setNewDestination(mapHeight, mapWidth);
