@@ -9,7 +9,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.tiled.TiledMap;
 
 public class Main extends BasicGame {
 	    
@@ -103,9 +102,9 @@ public class Main extends BasicGame {
 	    	if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
 	    	    gc.exit();
 	    	// need to slow this down cuz i think when i try and load a map it will explode and try a million times! LOL!
-	    	if (Keyboard.isKeyDown(Keyboard.KEY_LBRACKET))
-	    		mapFactory.loadNextStage();
 	    	if (Keyboard.isKeyDown(Keyboard.KEY_RBRACKET))
+	    		mapFactory.loadNextStage();
+	    	if (Keyboard.isKeyDown(Keyboard.KEY_LBRACKET))
 		    	mapFactory.loadPrevStage();
 	    	
 	    	// Move/Check Player
@@ -197,7 +196,7 @@ public class Main extends BasicGame {
 	         bulletFactory.updateBullets(mapFactory);
 	         
 	         // temp enemy update
-	         enemy.update(delta);
+	         enemy.update(delta, mapFactory);
 	         
 	    }
 	 

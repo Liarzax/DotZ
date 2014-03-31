@@ -1,9 +1,7 @@
 package com.au.Stark.Dotz.main;
 
-import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 public class BulletFactory {

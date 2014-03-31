@@ -33,6 +33,9 @@ public class Entity {
  	
  	// movement passes, to make it smother.
  	int pass = 0;
+ 	
+ 	// temp for collision
+ 	private float collisionPaddingDistance = 0.1f;
 	
 	public Entity() {
 		
@@ -71,30 +74,54 @@ public class Entity {
 	   sprite = left;
 	}
 	
-	void update(int delta) {
+	void update(int delta, MapFactory mapFactory) {
 		// TODO: add a thingy where it checks if at dest, create new dest, else move tawords dest.
 		
 		// dest up
 		if (destY < y) {
-			moveUp(delta);
+			/*if (!mapFactory.isBlocked(x, y - runSpeed)) {
+				moveUp(delta);
+            }*/
+			if (!mapFactory.isBlocked(x, y - delta * collisionPaddingDistance)) {
+				moveUp(delta);
+			}
+			//moveUp(delta);
 			//pass = 0;
 		}
         
         // dest down
 		if (destY > y) {
-			moveDown(delta);
+			/*if (!mapFactory.isBlocked(x, y + runSpeed)) {
+				moveDown(delta);
+			}*/
+			if (!mapFactory.isBlocked(x, y + mapFactory.getTileSize() + delta * collisionPaddingDistance)) {
+				moveDown(delta);
+			}
+			//moveDown(delta);
 			//pass = 0;
 		}
 		
 		// dest left;
 		if (destX < x) {
-			moveLeft(delta);
+			/*if (!mapFactory.isBlocked(x - runSpeed, y)) {
+				moveLeft(delta);
+			}*/
+			if (!mapFactory.isBlocked(x - delta * collisionPaddingDistance, y)) {
+				moveLeft(delta);
+			}
+			//moveLeft(delta);
 			//pass = 0;
 		}
         
         // dest right
 		if (destX > x) {
-			moveRight(delta);
+			/*if (!mapFactory.isBlocked(x + runSpeed, y)) {
+				moveRight(delta);
+			}*/
+			if (!mapFactory.isBlocked(x + mapFactory.getTileSize() + delta * collisionPaddingDistance, y)) {
+				moveRight(delta);
+			}
+			//moveRight(delta);
 			//pass = 0;
 		}
 		
