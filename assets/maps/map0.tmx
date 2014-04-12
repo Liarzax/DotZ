@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="100" height="100" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" name="grass" tilewidth="16" tileheight="16">
+  <image source="grass.png" width="128" height="128"/>
+ </tileset>
+ <tileset firstgid="65" name="rocks" tilewidth="16" tileheight="16">
+  <image source="rocks.png" width="128" height="128"/>
+  <tile id="0">
+   <properties>
+    <property name="blocked" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Tile Layer 1" width="100" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC+3Z127bQBRFUTnN6b33xOm99yL+/0/lCAGBGYXWkE7kIMhawH7hxQgw58UX3JjNZnvS3rQv7U8H0mY6mDbWPKd2KB1OR9LRdCwdTyfSyV2YUzuVTqcz6Ww6l86nC+niLsypXUqX05V0NV1L19ONdHNg3hUNzVvnl+fUbqXbaSvdSXfTvXQ/PRiYl/cxNG+dX55Te5gepcfpSXqanqXn6cXAvLyPct4/a51fnlN7mV6l1+lNepvepffpw8C8vI9y3j9rnV+eU/uYPqXP6Uv6mr6l72k++/mOy3l5H/PifP9s+Xzr96lN3R/K+yjn/bPyfDfi96lN3R/K+2jtF92I36fW7weLdzdmfyjvo7VfdI25/eNX/X6weHc72R9WzbsR56n1+8Hi3e1kf1g170acp1buD2P2jynzbsR5auX+MGb/mDLvRpynVu4P2+0f2zWfrd4vusZ8vu4/7h9U7g9D+8Gq+2h937B/TNfvB4t35/vH3zd1//D9Y73WuX+MmVNb5/7h+8d0v7Nf/Ik5tdZ+sOr/q6nZP9pa+8G65wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8D/4AQK3e7tAnAAA
+  </data>
+ </layer>
+</map>
