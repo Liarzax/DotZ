@@ -36,6 +36,10 @@ public class Entity {
 
 	// movement passes, to make it smother.
 	int pass = 0;
+	// direction need to go
+	boolean needGoUp = false, needGoLeft = false, needGoDown = false, needGoRight = false;
+	// direction just moved
+	//boolean justMovedUp = false, justMovedLeft = false, justMovedDown = false, justMovedRight = false;
 
 	// temp for collision
 	private float collisionPaddingDistance = 0.1f;
@@ -56,20 +60,40 @@ public class Entity {
 		// could have this shrunk to region? or give direct co-ordinates, or have if statements based on states?
 		idleWonder();
 
+		// sprite image / zombie style | currently 2 dif zombie types
+		int R = (int) ((Math.random() * (3 - 1)) + 1); 
 		//Load Sprite
-		Image [] movementUp = {new Image("assets/zomb1_UD1.png"), new Image("assets/zomb1_UD2.png"),
-				new Image("assets/zomb1_UD3.png"), new Image("assets/zomb1_UD4.png"), new Image("assets/zomb1_UD5.png"), 
-				new Image("assets/zomb1_UD6.png"), new Image("assets/zomb1_UD7.png"), new Image("assets/zomb1_UD8.png")};
-		Image [] movementDown = {new Image("assets/zomb1_UD1.png").getFlippedCopy(false, true), new Image("assets/zomb1_UD2.png").getFlippedCopy(false, true),
-				new Image("assets/zomb1_UD3.png").getFlippedCopy(false, true), new Image("assets/zomb1_UD4.png").getFlippedCopy(false, true), new Image("assets/zomb1_UD5.png").getFlippedCopy(false, true), 
-				new Image("assets/zomb1_UD6.png").getFlippedCopy(false, true), new Image("assets/zomb1_UD7.png").getFlippedCopy(false, true), new Image("assets/zomb1_UD8.png").getFlippedCopy(false, true)};
-		Image [] movementLeft = {new Image("assets/zomb1_LR1.png").getFlippedCopy(true, false), new Image("assets/zomb1_LR2.png").getFlippedCopy(true, false),
-				new Image("assets/zomb1_LR3.png").getFlippedCopy(true, false), new Image("assets/zomb1_LR4.png").getFlippedCopy(true, false), new Image("assets/zomb1_LR5.png").getFlippedCopy(true, false), 
-				new Image("assets/zomb1_LR6.png").getFlippedCopy(true, false), new Image("assets/zomb1_LR7.png").getFlippedCopy(true, false), new Image("assets/zomb1_LR8.png").getFlippedCopy(true, false)};
-		Image [] movementRight = {new Image("assets/zomb1_LR1.png"), new Image("assets/zomb1_LR2.png"),
-				new Image("assets/zomb1_LR3.png"), new Image("assets/zomb1_LR4.png"), new Image("assets/zomb1_LR5.png"), 
-				new Image("assets/zomb1_LR6.png"), new Image("assets/zomb1_LR7.png"), new Image("assets/zomb1_LR8.png")};
-		// Idle Image.
+		Image [] movementUp = {new Image("assets/zomb"+R+"_UD1.png"), new Image("assets/zomb"+R+"_UD2.png"),
+				new Image("assets/zomb"+R+"_UD3.png"), new Image("assets/zomb"+R+"_UD4.png"), new Image("assets/zomb"+R+"_UD5.png"), 
+				new Image("assets/zomb"+R+"_UD6.png"), new Image("assets/zomb"+R+"_UD7.png"), new Image("assets/zomb"+R+"_UD8.png")};
+		/*Image [] movementDown = {new Image("assets/zomb"+R+"_UD1.png").getFlippedCopy(false, true), new Image("assets/zomb"+R+"_UD2.png").getFlippedCopy(false, true),
+				new Image("assets/zomb"+R+"_UD3.png").getFlippedCopy(false, true), new Image("assets/zomb"+R+"_UD4.png").getFlippedCopy(false, true), new Image("assets/zomb"+R+"_UD5.png").getFlippedCopy(false, true), 
+				new Image("assets/zomb"+R+"_UD6.png").getFlippedCopy(false, true), new Image("assets/zomb"+R+"_UD7.png").getFlippedCopy(false, true), new Image("assets/zomb"+R+"_UD8.png").getFlippedCopy(false, true)};
+		Image [] movementLeft = {new Image("assets/zomb"+R+"_LR1.png").getFlippedCopy(true, false), new Image("assets/zomb"+R+"_LR2.png").getFlippedCopy(true, false),
+				new Image("assets/zomb"+R+"_LR3.png").getFlippedCopy(true, false), new Image("assets/zomb"+R+"_LR4.png").getFlippedCopy(true, false), new Image("assets/zomb"+R+"_LR5.png").getFlippedCopy(true, false), 
+				new Image("assets/zomb"+R+"_LR6.png").getFlippedCopy(true, false), new Image("assets/zomb"+R+"_LR7.png").getFlippedCopy(true, false), new Image("assets/zomb"+R+"_LR8.png").getFlippedCopy(true, false)};
+		Image [] movementRight = {new Image("assets/zomb"+R+"_LR1.png"), new Image("assets/zomb"+R+"_LR2.png"),
+				new Image("assets/zomb"+R+"_LR3.png"), new Image("assets/zomb"+R+"_LR4.png"), new Image("assets/zomb"+R+"_LR5.png"), 
+				new Image("assets/zomb"+R+"_LR6.png"), new Image("assets/zomb"+R+"_LR7.png"), new Image("assets/zomb"+R+"_LR8.png")};*/
+		Image [] movementDown = {new Image("assets/zomb"+R+"_UD1.png"), new Image("assets/zomb"+R+"_UD2.png"),
+				new Image("assets/zomb"+R+"_UD3.png"), new Image("assets/zomb"+R+"_UD4.png"), new Image("assets/zomb"+R+"_UD5.png"), 
+				new Image("assets/zomb"+R+"_UD6.png"), new Image("assets/zomb"+R+"_UD7.png"), new Image("assets/zomb"+R+"_UD8.png")};
+		Image [] movementLeft = {new Image("assets/zomb"+R+"_UD1.png"), new Image("assets/zomb"+R+"_UD2.png"),
+				new Image("assets/zomb"+R+"_UD3.png"), new Image("assets/zomb"+R+"_UD4.png"), new Image("assets/zomb"+R+"_UD5.png"), 
+				new Image("assets/zomb"+R+"_UD6.png"), new Image("assets/zomb"+R+"_UD7.png"), new Image("assets/zomb"+R+"_UD8.png")};
+		Image [] movementRight = {new Image("assets/zomb"+R+"_UD1.png"), new Image("assets/zomb"+R+"_UD2.png"),
+				new Image("assets/zomb"+R+"_UD3.png"), new Image("assets/zomb"+R+"_UD4.png"), new Image("assets/zomb"+R+"_UD5.png"), 
+				new Image("assets/zomb"+R+"_UD6.png"), new Image("assets/zomb"+R+"_UD7.png"), new Image("assets/zomb"+R+"_UD8.png")};
+		
+		// Idle ImageUD & LR? man, there has to be a way to rotate this stuff.
+		/*Image [] idle = {new Image("assets/zomb"+R+"_UD1.png")};
+		idle[1].rotate(2f);*/
+		for (int i = 0; i< movementUp.length; i++) {
+			movementDown[i].rotate(180f);
+			movementLeft[i].rotate(270f);
+			movementRight[i].rotate(90f);
+		}
+		
 		int [] duration = {200, 200, 200, 200, 200, 200, 200, 200};
 
 		up = new Animation(movementUp, duration, false);
@@ -78,7 +102,7 @@ public class Entity {
 		right = new Animation(movementRight, duration, false); 
 		// idle Image
 
-		// Starting orientation of the sprite. It will look right.
+		// Starting orientation of the sprite.
 		sprite = left;
 	}
 
@@ -87,54 +111,42 @@ public class Entity {
 		// TODO add another 4 vars that check what he is doing and bool, busy, so if busy, keep doing
 		// what his doinmg, else change to another pass on what his doing? makes sence in my head
 		// maby create a percentage? if closer then 90% change dest? hmm... 
+
+		// if just moved up/down/left/right etc, move in same direction? else change direction? else drool?
 		
-		// dest up
-		if (destY < y) {
-			/*if (!mapFactory.isBlocked(x, y - runSpeed)) {
-				moveUp(delta);
-            }*/
+		if (needGoUp) {
+			sprite = up;
 			if (!mapFactory.isBlocked(x, y - delta * collisionPaddingDistance)) {
+				//sprite.update(delta);
 				moveUp(delta);
 			}
-			//moveUp(delta);
-			//pass = 0;
 		}
 
-		// dest down
-		if (destY > y) {
-			/*if (!mapFactory.isBlocked(x, y + runSpeed)) {
-				moveDown(delta);
-			}*/
+		if (needGoDown) {
+			sprite = down;
 			if (!mapFactory.isBlocked(x, y + mapFactory.getTileSize() + delta * collisionPaddingDistance)) {
+				//sprite.update(delta);
 				moveDown(delta);
 			}
-			//moveDown(delta);
-			//pass = 0;
 		}
 
-		// dest left;
-		if (destX < x) {
-			/*if (!mapFactory.isBlocked(x - runSpeed, y)) {
-				moveLeft(delta);
-			}*/
+		if (needGoLeft) {
+			sprite = left;
 			if (!mapFactory.isBlocked(x - delta * collisionPaddingDistance, y)) {
+				//sprite.update(delta);
 				moveLeft(delta);
 			}
-			//moveLeft(delta);
-			//pass = 0;
 		}
 
-		// dest right
-		if (destX > x) {
-			/*if (!mapFactory.isBlocked(x + runSpeed, y)) {
-				moveRight(delta);
-			}*/
+		if (needGoRight) {
+			sprite = right;
 			if (!mapFactory.isBlocked(x + mapFactory.getTileSize() + delta * collisionPaddingDistance, y)) {
+				//sprite.update(delta);
 				moveRight(delta);
 			}
-			//moveRight(delta);
-			//pass = 0;
 		}
+		// update animation after changes
+		sprite.update(delta);
 
 		// TODO: Seems ok, but needs work!
 		// add idle, maby idle timer, idk, something looks like its missing.
@@ -143,9 +155,19 @@ public class Entity {
 		
 		int R = (int) ((Math.random() * (150 - 60)) + 60); 
 		if(pass > R) {
+			needGoUp = false;
+			needGoLeft = false;
+			needGoDown = false;
+			needGoRight = false;
+			
 			//System.out.println("DestX = "+destX+" DestY = "+destY+" Reached!");
 			idleWonder();
 			pass = 0;
+			
+			/*justMovedUp = false;
+			justMovedLeft = false;
+			justMovedDown = false;
+			justMovedRight = false;*/
 		}
 		pass++;
 		//System.out.println("Pass "+pass+" Done!");
@@ -163,17 +185,37 @@ public class Entity {
 		
 		// set dest x 
 		while (!xSet) {
-			destX = (int) ((Math.random() * ((spawnX*0.2) - (spawnX/0.2))) + (spawnX/0.2)); 
+			destX = (int) ((Math.random() * ((spawnX*1.2) - (spawnX*0.2))) + (spawnX*0.2)); 
 			if (destX < (mapWidth -1) && destX > (mapWidth - (mapWidth +1))) {
 				xSet = true;
+			}
+			
+			if (destX < x) {
+				needGoLeft = true;
+			}
+			else if (destX > x) {
+				needGoRight = true;
+			}
+			else {
+				// drool.
 			}
 		}
 		
 		// set dest y
 		while (!ySet) {
-			destY = (int) ((Math.random() * ((spawnY*0.2) - (spawnY/0.2))) + (spawnY/0.2)); 
+			destY = (int) ((Math.random() * ((spawnY*1.2) - (spawnY*0.2))) + (spawnY*0.2)); 
 			if (destY < (mapHeight -1) && destY > (mapHeight - (mapHeight +1))) {
 				ySet = true;
+			}
+			
+			if (destY < y) {
+				needGoUp = true;
+			}
+			else if (destY > y) {
+				needGoDown = true;
+			}
+			else {
+				// drool.
 			}
 		}
 		
@@ -207,6 +249,10 @@ public class Entity {
 		x += delta * curWalkSpeed;
 		faceingX = 1;
 		faceingY = 0;
+	}
+	
+	public void destroyEntity() {
+		
 	}
 
 }

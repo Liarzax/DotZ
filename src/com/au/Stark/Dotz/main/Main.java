@@ -11,7 +11,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 public class Main extends BasicGame {
-	final static int majorVersion = 0, minorVersion = 0, bugfix = 0, buildRev = 12;
+	final static int majorVersion = 0, minorVersion = 0, bugfix = 0, buildRev = 13;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 
@@ -27,7 +27,8 @@ public class Main extends BasicGame {
 	MapFactory mapFactory = new MapFactory();
 
 	// Init Sprite
-	private Animation sprite, up, down, left, right;
+	private Animation sprite, up, down, left, right, idleU, idleD, idleL, idleR;
+	boolean playerIdle = true;
 	// sprite location
 	private float x = 34f, y = 66f;
 	// sprite facing
@@ -69,29 +70,51 @@ public class Main extends BasicGame {
 		//Load Map
 		mapFactory.init();
 
-		//Load Sprite NOTE: can also just have 1 direction and rotate as required ;-) .ROTATE(FLOAT);
-		Image [] movementUp = {new Image("assets/zomb1_UD1.png"), new Image("assets/zomb1_UD2.png"),
-				new Image("assets/zomb1_UD3.png"), new Image("assets/zomb1_UD4.png"), new Image("assets/zomb1_UD5.png"), 
-				new Image("assets/zomb1_UD6.png"), new Image("assets/zomb1_UD7.png"), new Image("assets/zomb1_UD8.png")};
-		Image [] movementDown = {new Image("assets/zomb1_UD1.png").getFlippedCopy(false, true), new Image("assets/zomb1_UD2.png").getFlippedCopy(false, true),
-				new Image("assets/zomb1_UD3.png").getFlippedCopy(false, true), new Image("assets/zomb1_UD4.png").getFlippedCopy(false, true), new Image("assets/zomb1_UD5.png").getFlippedCopy(false, true), 
-				new Image("assets/zomb1_UD6.png").getFlippedCopy(false, true), new Image("assets/zomb1_UD7.png").getFlippedCopy(false, true), new Image("assets/zomb1_UD8.png").getFlippedCopy(false, true)};
-		Image [] movementLeft = {new Image("assets/zomb1_LR1.png").getFlippedCopy(true, false), new Image("assets/zomb1_LR2.png").getFlippedCopy(true, false),
-				new Image("assets/zomb1_LR3.png").getFlippedCopy(true, false), new Image("assets/zomb1_LR4.png").getFlippedCopy(true, false), new Image("assets/zomb1_LR5.png").getFlippedCopy(true, false), 
-				new Image("assets/zomb1_LR6.png").getFlippedCopy(true, false), new Image("assets/zomb1_LR7.png").getFlippedCopy(true, false), new Image("assets/zomb1_LR8.png").getFlippedCopy(true, false)};
-		Image [] movementRight = {new Image("assets/zomb1_LR1.png"), new Image("assets/zomb1_LR2.png"),
-				new Image("assets/zomb1_LR3.png"), new Image("assets/zomb1_LR4.png"), new Image("assets/zomb1_LR5.png"), 
-				new Image("assets/zomb1_LR6.png"), new Image("assets/zomb1_LR7.png"), new Image("assets/zomb1_LR8.png")};
+		//Load Sprite via Rotation! NOTE: Done but im sure theres a cleaner way to do this!?
+		Image [] movementUp = {new Image("assets/player_UD1.png"), new Image("assets/player_UD2.png"),
+				new Image("assets/player_UD3.png"), new Image("assets/player_UD4.png"), new Image("assets/player_UD5.png"), 
+				new Image("assets/player_UD6.png"), new Image("assets/player_UD7.png"), new Image("assets/player_UD8.png")};
+		Image [] movementDown = {new Image("assets/player_UD1.png"), new Image("assets/player_UD2.png"),
+				new Image("assets/player_UD3.png"), new Image("assets/player_UD4.png"), new Image("assets/player_UD5.png"), 
+				new Image("assets/player_UD6.png"), new Image("assets/player_UD7.png"), new Image("assets/player_UD8.png")};
+		Image [] movementLeft = {new Image("assets/player_UD1.png"), new Image("assets/player_UD2.png"),
+				new Image("assets/player_UD3.png"), new Image("assets/player_UD4.png"), new Image("assets/player_UD5.png"), 
+				new Image("assets/player_UD6.png"), new Image("assets/player_UD7.png"), new Image("assets/player_UD8.png")};
+		Image [] movementRight = {new Image("assets/player_UD1.png"), new Image("assets/player_UD2.png"),
+				new Image("assets/player_UD3.png"), new Image("assets/player_UD4.png"), new Image("assets/player_UD5.png"), 
+				new Image("assets/player_UD6.png"), new Image("assets/player_UD7.png"), new Image("assets/player_UD8.png")};
+		
+		Image [] movementIdleU = {new Image("assets/player_iD1.png")};
+		Image [] movementIdleD = {new Image("assets/player_iD1.png")};
+		Image [] movementIdleL = {new Image("assets/player_iD1.png")};
+		Image [] movementIdleR = {new Image("assets/player_iD1.png")};
+		
+		for (int i = 0; i < movementUp.length; i++) {
+			movementDown[i].rotate(180f);
+			movementLeft[i].rotate(270f);
+			movementRight[i].rotate(90f);
+		}
+		for (int i = 0; i< movementIdleU.length; i++) {
+			movementIdleD[i].rotate(180f);
+			movementIdleL[i].rotate(270f);
+			movementIdleR[i].rotate(90f);
+		}
+		
 		int [] duration = {200, 200, 200, 200, 200, 200, 200, 200};
+		int [] idleDur = {200};
 
 		up = new Animation(movementUp, duration, false);
 		down = new Animation(movementDown, duration, false);
 		left = new Animation(movementLeft, duration, false);
 		right = new Animation(movementRight, duration, false); 
+		idleU = new Animation(movementIdleU, idleDur, false);
+		idleD = new Animation(movementIdleD, idleDur, false);
+		idleL = new Animation(movementIdleL, idleDur, false);
+		idleR = new Animation(movementIdleR, idleDur, false);
 		// idle animation?
 
 		// spawn orientation of the sprite. It will look right.
-		sprite = right;
+		sprite = idleR;
 
 		// Load Bullet.init/constructor, etc	
 		bulletFactory.initBulletFactory();
@@ -123,6 +146,7 @@ public class Main extends BasicGame {
 		// Move/Check Player
 		if (Keyboard.isKeyDown(Input.KEY_UP)) {
 			sprite = up;
+			playerIdle = false;
 
 			if (!mapFactory.isBlocked(x, y - delta * collisionPaddingDistance)) {
 				sprite.update(delta);
@@ -139,6 +163,7 @@ public class Main extends BasicGame {
 
 		if (Keyboard.isKeyDown(Input.KEY_DOWN)) {
 			sprite = down;
+			playerIdle = false;
 
 			if (!mapFactory.isBlocked(x, y + mapFactory.getTileSize() + delta * collisionPaddingDistance)) {
 				sprite.update(delta);
@@ -153,6 +178,7 @@ public class Main extends BasicGame {
 
 		if (Keyboard.isKeyDown(Input.KEY_LEFT)) {
 			sprite = left;
+			playerIdle = false;
 
 			if (!mapFactory.isBlocked(x - delta * collisionPaddingDistance, y)) {
 				sprite.update(delta);
@@ -167,6 +193,7 @@ public class Main extends BasicGame {
 
 		if (Keyboard.isKeyDown(Input.KEY_RIGHT)) {
 			sprite = right;
+			playerIdle = false;
 
 			if (!mapFactory.isBlocked(x + mapFactory.getTileSize() + delta * collisionPaddingDistance, y)) {
 				sprite.update(delta);
@@ -178,6 +205,7 @@ public class Main extends BasicGame {
 			faceingX = 1;
 			faceingY = 0;
 		}
+		
 
 		// Fire!
 		if (Keyboard.isKeyDown(Input.KEY_SPACE) && reloading == false) {
@@ -202,6 +230,32 @@ public class Main extends BasicGame {
 				reloading = false;
 			}
 		}
+		
+		// else display idle animation and rotate animation to facing
+		if (playerIdle) {
+			if (sprite != idleL || sprite != idleR || sprite != idleU || sprite != idleD) {
+				if (faceingX == 1) {
+					//System.out.println("setting idle RIght");
+					sprite = idleR;
+				}
+				if (faceingX == -1) {
+					//System.out.println("setting idle Left");
+					sprite = idleL;
+				}
+				if (faceingY == -1) {
+					//System.out.println("setting idle Up");
+					sprite = idleU;
+				}
+				if (faceingY == 1) {
+					//System.out.println("setting idle Down");
+					sprite = idleD;
+				}
+			}
+			sprite.update(delta);
+		}
+		
+		// player finished doing things
+		playerIdle = true;
 
 
 
