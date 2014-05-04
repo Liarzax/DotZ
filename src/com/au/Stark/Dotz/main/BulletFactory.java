@@ -11,7 +11,7 @@ public class BulletFactory {
 
 	// Pew Pew Details
 	int bulletSpeed = 6;
-	private Animation pewLR, pewUD;
+	private Animation pewLR, pewUD, pew;
 
 	// firing speed controller. Possible to use game timer? or timer class?
 	int curBulletFireTimer = 0;
@@ -40,9 +40,11 @@ public class BulletFactory {
 		// Could load multiple then assign bullets depending on clip in wepon? or bullets in clip? idk.
 		Image [] movePewLR = {new Image("assets/pewLR.png"), new Image("assets/pewLR.png")};
 		Image [] movePewUD = {new Image("assets/pewUD.png"), new Image("assets/pewUD.png")};
+		Image [] movePew = {new Image("assets/pew.png"), new Image("assets/pew.png")};
 
 		pewLR = new Animation(movePewLR, duration, false);
 		pewUD = new Animation(movePewUD, duration, false);
+		pew = new Animation(movePew, duration, false);
 	}
 
 	public void createBullet(Animation sprite, int x, int y, int faceingX, int faceingY) {
@@ -50,13 +52,15 @@ public class BulletFactory {
 			// Gun Fire Sound!
 			System.out.println("Bang!");
 			bullets[curBulletsOnField] = new Bullet();
-			bullets[curBulletsOnField].setPewLR(pewLR);
-			bullets[curBulletsOnField].setPewUD(pewUD);
+			//bullets[curBulletsOnField].setPewLR(pewLR);
+			//bullets[curBulletsOnField].setPewUD(pewUD);
+			bullets[curBulletsOnField].setPew(pew);
 			bullets[curBulletsOnField].setBulletPosX(x + (faceingX *2));
 			bullets[curBulletsOnField].setBulletPosY(y + (faceingY *2));
 			bullets[curBulletsOnField].setDirX(faceingX);
 			bullets[curBulletsOnField].setDirY(faceingY);
 
+			bullets[curBulletsOnField].exists = true;
 			curBulletsOnField++;
 		}
 		else {
@@ -75,9 +79,12 @@ public class BulletFactory {
 	}
 
 	// TODO: Need to change this into a link list or something, cuz this is limited and retarted!
-	public void updateBullets(MapFactory mapFactory) {
+	public void updateBullets(MapFactory mapFactory, Entity enemies[]) {
 		for (int i = 0; i < curBulletsOnField; i++) {
-			if (!mapFactory.isBlocked(bullets[i].getBulletPosX() + bullets[i].getDirX(), bullets[i].getBulletPosY() + bullets[i].getDirY())) {
+			float nextX = bullets[i].getBulletPosX() + bullets[i].getDirX();
+			float nextY = bullets[i].getBulletPosY() + bullets[i].getDirY();
+			
+			if (!mapFactory.isBlocked(nextX, nextY) &&  !BulletCollision(bullets, enemies)) {
 				bullets[i].update(bulletSpeed);
 			}
 			//bullets[i].update(bulletSpeed);
@@ -135,5 +142,25 @@ public class BulletFactory {
 
 
 
+	// TEMP 
+	// super bang collision dang!
+	public boolean BulletCollision(Bullet bullets[], Entity enemies[]) {
+		boolean collision = false;
+		// NOTE; if intersected push that shit outa the way
+		for (int b = 0; b < curBulletsOnField; b++) {
+			if (bullets[b].exists) {
+				for (int i = 0; i < enemies.length; i++) { 
+					if(bullets[b].rec.intersects(enemies[i].rec) ) { // && !enemies[i].dead) {
+						System.out.println("Bullet Collision? w/ Enemy " +i);
+						collision = true;
+						
+						enemies[i].destroyEntity();
+						bullets[b].destroyBullet();
+					}
+				}
+			}
+		}
+		return collision;
+	}
 
 }

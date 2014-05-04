@@ -9,9 +9,10 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Rectangle;
 
 public class Main extends BasicGame {
-	final static int majorVersion = 0, minorVersion = 0, bugfix = 0, buildRev = 13;
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 14;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 
@@ -31,14 +32,17 @@ public class Main extends BasicGame {
 	boolean playerIdle = true;
 	// sprite location
 	private float x = 34f, y = 66f;
+	//int playerX[], playerY[];
+	// Bounding box for Sprite - 
+	private Rectangle rec = new Rectangle(x, y, 32f, 32f);
 	// sprite facing
-	int faceingX = 0;
-	int faceingY = 0;
+	int faceingX = 0, faceingY = 0;
 	// movement speed
-	float walkSpeed = 0.05f;
-	float runSpeed = 0.1f;
+	float walkSpeed = 0.05f, runSpeed = 0.08f;
 	// misc
-	float collisionPaddingDistance = 0.1f;
+	float collisionPaddingDistance = 0.90f;
+	// idk, should always be half the sprite size, 32/2 = 16 (this means none of those retarted 16x32 sprites).
+	int centerOfSprite = 16;
 	// reload shit also need animation
 	boolean reloading = false;
 
@@ -113,8 +117,13 @@ public class Main extends BasicGame {
 		idleR = new Animation(movementIdleR, idleDur, false);
 		// idle animation?
 
-		// spawn orientation of the sprite. It will look right.
+		// spawn orientation of the sprite. It will look right & idle.
 		sprite = idleR;
+		
+		// Sprite size 32x32, tile size 16x16
+		// stuff.
+		
+		
 
 		// Load Bullet.init/constructor, etc	
 		bulletFactory.initBulletFactory();
@@ -123,8 +132,8 @@ public class Main extends BasicGame {
 		//enemy.initEntity(337, 233);
 		// Need to put a check to make sure not spawning in wall, also clean it up, temp ok, whatevs bru
 		for (int i = 0; i < maxEnemies; i++) {
-			int eStartX = createRandNum(100, 600); 
-			int eStartY = createRandNum(100, 350); 
+			int eStartX = randNumBetween(100, 600); 
+			int eStartY = randNumBetween(100, 350); 
 			
 			enemies[i] = new Entity();
 			enemies[i].initEntity(eStartX, eStartY);
@@ -143,12 +152,18 @@ public class Main extends BasicGame {
 		if (Keyboard.isKeyDown(Keyboard.KEY_LBRACKET))
 			mapFactory.loadPrevStage();
 
+		// TODO - bullshit Collision start		
 		// Move/Check Player
+		float nextX = 0;
+		float nextY = 0;
+		
 		if (Keyboard.isKeyDown(Input.KEY_UP)) {
 			sprite = up;
 			playerIdle = false;
-
-			if (!mapFactory.isBlocked(x, y - delta * collisionPaddingDistance)) {
+			
+			nextX = x + centerOfSprite;
+			nextY = (y+centerOfSprite) - delta * collisionPaddingDistance;
+			if (!mapFactory.isBlocked(nextX, nextY) && !entityCollision(nextX, nextY, enemies)){// && entityCollision(x, y, enemies) == false) {
 				sprite.update(delta);
 				// The lower the delta the slower the sprite will move.
 				// LSHIFT to run, sucka!
@@ -157,6 +172,12 @@ public class Main extends BasicGame {
 				else
 					y -= delta * walkSpeed;
 			}
+			else {
+				// put a thing that checks if player is closer to this side, then go -- that way else -- other way.
+				y++;
+				
+			}
+			
 			faceingX = 0;
 			faceingY = -1;
 		}
@@ -165,13 +186,19 @@ public class Main extends BasicGame {
 			sprite = down;
 			playerIdle = false;
 
-			if (!mapFactory.isBlocked(x, y + mapFactory.getTileSize() + delta * collisionPaddingDistance)) {
+			nextX = x + centerOfSprite;
+			nextY = (y+centerOfSprite) + delta * collisionPaddingDistance;
+			if (!mapFactory.isBlocked(nextX, nextY) && !entityCollision(nextX, nextY, enemies)){// && entityCollision(x, y, enemies) == false) {
 				sprite.update(delta);
 				if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
 					y += delta * runSpeed;
 				else 
 					y += delta * walkSpeed;
 			}
+			else {
+				y--;
+			}
+			
 			faceingX = 0;
 			faceingY = 1;
 		}
@@ -180,13 +207,19 @@ public class Main extends BasicGame {
 			sprite = left;
 			playerIdle = false;
 
-			if (!mapFactory.isBlocked(x - delta * collisionPaddingDistance, y)) {
+			nextX = (x+centerOfSprite) - delta * collisionPaddingDistance;
+			nextY = y + centerOfSprite;
+			if (!mapFactory.isBlocked(nextX, nextY) && !entityCollision(nextX, nextY, enemies)){// && entityCollision(x, y, enemies) == false) {
 				sprite.update(delta);
 				if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
 					x -= delta * runSpeed;
 				else
 					x -= delta * walkSpeed;
 			}
+			else {
+				x++;
+			}
+			
 			faceingX = -1;
 			faceingY = 0;
 		}
@@ -195,17 +228,29 @@ public class Main extends BasicGame {
 			sprite = right;
 			playerIdle = false;
 
-			if (!mapFactory.isBlocked(x + mapFactory.getTileSize() + delta * collisionPaddingDistance, y)) {
+			nextX = (x+centerOfSprite) + delta * collisionPaddingDistance;
+			nextY = y + centerOfSprite;
+			if (!mapFactory.isBlocked(nextX, nextY) && !entityCollision(nextX, nextY, enemies)){// && entityCollision(x, y, enemies) == false) {
 				sprite.update(delta);
 				if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
 					x += delta * runSpeed;
 				else
 					x += delta * walkSpeed;
 			}
+			else {
+				x--;
+			}
+			
 			faceingX = 1;
 			faceingY = 0;
 		}
 		
+		
+		// Move bounding box with player.
+		rec.setX(x);
+		rec.setY(y);
+		// TESTING SHIT
+		entityCollision(x, y, enemies);
 
 		// Fire!
 		if (Keyboard.isKeyDown(Input.KEY_SPACE) && reloading == false) {
@@ -251,6 +296,7 @@ public class Main extends BasicGame {
 					sprite = idleD;
 				}
 			}
+			//sprite.restart(); not restarting animation? - check later
 			sprite.update(delta);
 		}
 		
@@ -260,7 +306,7 @@ public class Main extends BasicGame {
 
 
 
-		bulletFactory.updateBullets(mapFactory);
+		bulletFactory.updateBullets(mapFactory, enemies);
 
 		// temp enemy update
 		//enemy.update(delta, mapFactory);
@@ -288,9 +334,23 @@ public class Main extends BasicGame {
 	}
 	
 	// stupid java rand generator only from 0 to num, not from num to num. FIXED!
-	public int createRandNum(int min, int max) {
+	public int randNumBetween(int min, int max) {
 		int num = (int) ((Math.random() * (max - min)) + min); 
 		return num;
+	}
+	
+	// super bang collision dang!
+	public boolean entityCollision(float x, float y, Entity enemies[]) {
+		boolean collision = false;
+		// NOTE; if intersected push that shit outa the way
+		for (int i = 0; i < enemies.length; i++) { 
+			if(rec.intersects(enemies[i].rec)) {
+				System.out.println("Possible Collision? w/ Enemy " +i);
+				collision = true;
+			}
+				
+		}
+		return collision;
 	}
 
 

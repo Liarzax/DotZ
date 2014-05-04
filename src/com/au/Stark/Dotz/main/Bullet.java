@@ -1,13 +1,17 @@
 package com.au.Stark.Dotz.main;
 
 import org.newdawn.slick.Animation;
+import org.newdawn.slick.geom.Rectangle;
 
 public class Bullet {
 	
 	// Pew Pew Details
-    private Animation pewLR, pewUD;
+    private Animation pewLR, pewUD, pew;
     private int bulletPosX = 0, bulletPosY = 0;
     private int dirX = 0, dirY = 0;
+    Rectangle rec = new Rectangle(0, 0, 3, 3);
+    
+    boolean exists = false;
     
 	// type of bullet
 	// damage
@@ -19,16 +23,26 @@ public class Bullet {
 	}
 	
 	public void update(int bulletSpeed) {
-		bulletPosX += (dirX * bulletSpeed);
-		bulletPosY += (dirY * bulletSpeed);
+		if (exists) {
+			bulletPosX += (dirX * bulletSpeed);
+			bulletPosY += (dirY * bulletSpeed);
+			rec.setX(bulletPosX);
+			rec.setY(bulletPosY);
+		}
+		
 	}
 	
 	public void render () {
-		if (this.dirX != 0 && dirY == 0 )
+		/*if (this.dirX != 0 && dirY == 0 )
 			pewLR.draw(bulletPosX, bulletPosY);
 	
 		if(this.dirX == 0 && dirY != 0 )
-			pewUD.draw(bulletPosX, bulletPosY);
+			pewUD.draw(bulletPosX, bulletPosY);*/
+		if (exists) {
+			pew.draw(bulletPosX, bulletPosY);
+		}
+		
+		
 	}
 
 	public Animation getPewLR() {
@@ -77,6 +91,17 @@ public class Bullet {
 
 	public void setDirY(int dirY) {
 		this.dirY = dirY;
+	}
+
+	public void setPew(Animation pew) {
+		this.pew = pew;		
+	}
+
+	public void destroyBullet() {
+		// TODO Auto-generated method stub
+		exists = false;
+		rec.setWidth(0);
+		rec.setHeight(0);
 	}
 	
 }

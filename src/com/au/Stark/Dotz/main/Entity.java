@@ -5,17 +5,24 @@ import java.util.Random;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Rectangle;
 
 public class Entity {
 
-	// spawn location
-	float spawnX = 0f, spawnY = 0f;
 	// Init Sprite
 	Animation sprite, up, down, left, right, idle; // needs idle image for shits n giggles.
 	// sprite location
 	float x = 0f, y = 0f;
 	int faceingX = 0;
 	int faceingY = 0;
+	// sprite size
+	int spritePicSize = 16;
+	// Temp Bounding Box Info for Testing
+	Rectangle rec = new Rectangle(x, y, 32f, 32f);
+	boolean dead = false;
+	
+	// spawn location
+	float spawnX = 0f, spawnY = 0f;
 
 	float destX = 0, destY = 0;
 
@@ -42,7 +49,7 @@ public class Entity {
 	//boolean justMovedUp = false, justMovedLeft = false, justMovedDown = false, justMovedRight = false;
 
 	// temp for collision
-	private float collisionPaddingDistance = 0.1f;
+	private float collisionPaddingDistance = 0.95f;
 
 	public Entity() {
 
@@ -66,15 +73,6 @@ public class Entity {
 		Image [] movementUp = {new Image("assets/zomb"+R+"_UD1.png"), new Image("assets/zomb"+R+"_UD2.png"),
 				new Image("assets/zomb"+R+"_UD3.png"), new Image("assets/zomb"+R+"_UD4.png"), new Image("assets/zomb"+R+"_UD5.png"), 
 				new Image("assets/zomb"+R+"_UD6.png"), new Image("assets/zomb"+R+"_UD7.png"), new Image("assets/zomb"+R+"_UD8.png")};
-		/*Image [] movementDown = {new Image("assets/zomb"+R+"_UD1.png").getFlippedCopy(false, true), new Image("assets/zomb"+R+"_UD2.png").getFlippedCopy(false, true),
-				new Image("assets/zomb"+R+"_UD3.png").getFlippedCopy(false, true), new Image("assets/zomb"+R+"_UD4.png").getFlippedCopy(false, true), new Image("assets/zomb"+R+"_UD5.png").getFlippedCopy(false, true), 
-				new Image("assets/zomb"+R+"_UD6.png").getFlippedCopy(false, true), new Image("assets/zomb"+R+"_UD7.png").getFlippedCopy(false, true), new Image("assets/zomb"+R+"_UD8.png").getFlippedCopy(false, true)};
-		Image [] movementLeft = {new Image("assets/zomb"+R+"_LR1.png").getFlippedCopy(true, false), new Image("assets/zomb"+R+"_LR2.png").getFlippedCopy(true, false),
-				new Image("assets/zomb"+R+"_LR3.png").getFlippedCopy(true, false), new Image("assets/zomb"+R+"_LR4.png").getFlippedCopy(true, false), new Image("assets/zomb"+R+"_LR5.png").getFlippedCopy(true, false), 
-				new Image("assets/zomb"+R+"_LR6.png").getFlippedCopy(true, false), new Image("assets/zomb"+R+"_LR7.png").getFlippedCopy(true, false), new Image("assets/zomb"+R+"_LR8.png").getFlippedCopy(true, false)};
-		Image [] movementRight = {new Image("assets/zomb"+R+"_LR1.png"), new Image("assets/zomb"+R+"_LR2.png"),
-				new Image("assets/zomb"+R+"_LR3.png"), new Image("assets/zomb"+R+"_LR4.png"), new Image("assets/zomb"+R+"_LR5.png"), 
-				new Image("assets/zomb"+R+"_LR6.png"), new Image("assets/zomb"+R+"_LR7.png"), new Image("assets/zomb"+R+"_LR8.png")};*/
 		Image [] movementDown = {new Image("assets/zomb"+R+"_UD1.png"), new Image("assets/zomb"+R+"_UD2.png"),
 				new Image("assets/zomb"+R+"_UD3.png"), new Image("assets/zomb"+R+"_UD4.png"), new Image("assets/zomb"+R+"_UD5.png"), 
 				new Image("assets/zomb"+R+"_UD6.png"), new Image("assets/zomb"+R+"_UD7.png"), new Image("assets/zomb"+R+"_UD8.png")};
@@ -113,10 +111,14 @@ public class Entity {
 		// maby create a percentage? if closer then 90% change dest? hmm... 
 
 		// if just moved up/down/left/right etc, move in same direction? else change direction? else drool?
+		float nextX = 0;
+		float nextY = 0;
 		
 		if (needGoUp) {
 			sprite = up;
-			if (!mapFactory.isBlocked(x, y - delta * collisionPaddingDistance)) {
+			nextX = x+spritePicSize;
+			nextY = (y+spritePicSize) - delta * collisionPaddingDistance;
+			if (!mapFactory.isBlocked(nextX, nextY)) {
 				//sprite.update(delta);
 				moveUp(delta);
 			}
@@ -124,7 +126,9 @@ public class Entity {
 
 		if (needGoDown) {
 			sprite = down;
-			if (!mapFactory.isBlocked(x, y + mapFactory.getTileSize() + delta * collisionPaddingDistance)) {
+			nextX = x+spritePicSize;
+			nextY = (y+spritePicSize) + delta * collisionPaddingDistance;
+			if (!mapFactory.isBlocked(nextX, nextY)) {
 				//sprite.update(delta);
 				moveDown(delta);
 			}
@@ -132,7 +136,9 @@ public class Entity {
 
 		if (needGoLeft) {
 			sprite = left;
-			if (!mapFactory.isBlocked(x - delta * collisionPaddingDistance, y)) {
+			nextX = (x+spritePicSize) - delta * collisionPaddingDistance;
+			nextY = y+spritePicSize;
+			if (!mapFactory.isBlocked(nextX, nextY)) {
 				//sprite.update(delta);
 				moveLeft(delta);
 			}
@@ -140,13 +146,18 @@ public class Entity {
 
 		if (needGoRight) {
 			sprite = right;
-			if (!mapFactory.isBlocked(x + mapFactory.getTileSize() + delta * collisionPaddingDistance, y)) {
+			nextX = (x+spritePicSize) + delta * collisionPaddingDistance;
+			nextY = y+spritePicSize;
+			if (!mapFactory.isBlocked(nextX, nextY)) {
 				//sprite.update(delta);
 				moveRight(delta);
 			}
 		}
 		// update animation after changes
 		sprite.update(delta);
+		// Move bounding box with player.
+		rec.setX(x);
+		rec.setY(y);
 
 		// TODO: Seems ok, but needs work!
 		// add idle, maby idle timer, idk, something looks like its missing.
@@ -161,7 +172,10 @@ public class Entity {
 			needGoRight = false;
 			
 			//System.out.println("DestX = "+destX+" DestY = "+destY+" Reached!");
-			idleWonder();
+			if (!dead) {
+				idleWonder();
+			}
+			
 			pass = 0;
 			
 			/*justMovedUp = false;
@@ -179,7 +193,7 @@ public class Entity {
 	}
 	
 	private void idleWonder() {
-		System.out.println("Setting New Destination");
+		//System.out.println("Setting New Destination");
 		boolean xSet = false;
 		boolean ySet = false;
 		
@@ -219,7 +233,7 @@ public class Entity {
 			}
 		}
 		
-		System.out.println("DestX = "+destX+" DestY = "+destY);
+		//System.out.println("DestX = "+destX+" DestY = "+destY);
 
 	}
 
@@ -252,7 +266,9 @@ public class Entity {
 	}
 	
 	public void destroyEntity() {
-		
+		dead = true;
+		rec.setWidth(0);
+		rec.setHeight(0);
 	}
 
 }

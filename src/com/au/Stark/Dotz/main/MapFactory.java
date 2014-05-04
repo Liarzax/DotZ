@@ -1,6 +1,7 @@
 package com.au.Stark.Dotz.main;
 
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.tiled.TiledMap;
 
 public class MapFactory {
@@ -10,10 +11,13 @@ public class MapFactory {
 	private TiledMap currentMap;
 	// Map Collision Data
 	private boolean[][] blocked;
-	private static final int SIZE = 32;  // tile size | sprite/collision range?
+	private static final int TILESIZE = 16;  // tile size (orig Map 32).
+	
+	// tile ID
 
 	// the level we are on/map we are using - could end up putting this into a stage class or something?
-	private int curStage = 1;
+	// 0 = debug stage
+	private int curStage = 0;
 	private int lastStage = curStage--;
 	private int nextStage = curStage++;
 
@@ -84,6 +88,21 @@ public class MapFactory {
 		int yBlock = (int)y / getTileSize();
 		return blocked[xBlock][yBlock];
 	}
+	
+	/*
+	public boolean entityCollision(Rectangle rec, float x, float y, Entity enemies[]) {
+		boolean collision = false;
+		
+		for (int i = 0; i < enemies.length; i++) {
+			if(rec.getX() > enemies[i].rec.getX() && rec.getX() < (enemies[i].rec.getX() + enemies[i].rec.getWidth())) {
+				if(rec.getY() > enemies[i].rec.getY() && rec.getY() < (enemies[i].rec.getY() + enemies[i].rec.getHeight())) {
+					System.out.println("Possible COllision? w/ Enemy " +i);
+					collision = true;
+				}
+			}
+		}
+		return collision;
+	}*/
 
 	public TiledMap getCurMap() {
 		return currentMap;
@@ -94,7 +113,7 @@ public class MapFactory {
 	}
 
 	public static int getTileSize() {
-		return SIZE;
+		return TILESIZE;
 	}
 
 	public int getCurStage() {
