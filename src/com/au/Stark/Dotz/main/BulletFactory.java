@@ -38,12 +38,12 @@ public class BulletFactory {
 	public void initBulletFactory() throws SlickException {
 		//Load Bullet.init/constructor, etc
 		// Could load multiple then assign bullets depending on clip in wepon? or bullets in clip? idk.
-		Image [] movePewLR = {new Image("assets/pewLR.png"), new Image("assets/pewLR.png")};
-		Image [] movePewUD = {new Image("assets/pewUD.png"), new Image("assets/pewUD.png")};
+		//Image [] movePewLR = {new Image("assets/pewLR.png"), new Image("assets/pewLR.png")};
+		//Image [] movePewUD = {new Image("assets/pewUD.png"), new Image("assets/pewUD.png")};
 		Image [] movePew = {new Image("assets/pew.png"), new Image("assets/pew.png")};
 
-		pewLR = new Animation(movePewLR, duration, false);
-		pewUD = new Animation(movePewUD, duration, false);
+		//pewLR = new Animation(movePewLR, duration, false);
+		//pewUD = new Animation(movePewUD, duration, false);
 		pew = new Animation(movePew, duration, false);
 	}
 
@@ -81,13 +81,19 @@ public class BulletFactory {
 	// TODO: Need to change this into a link list or something, cuz this is limited and retarted!
 	public void updateBullets(MapFactory mapFactory, Entity enemies[]) {
 		for (int i = 0; i < curBulletsOnField; i++) {
-			float nextX = bullets[i].getBulletPosX() + bullets[i].getDirX();
-			float nextY = bullets[i].getBulletPosY() + bullets[i].getDirY();
 			
-			if (!mapFactory.isBlocked(nextX, nextY) &&  !BulletCollision(bullets, enemies)) {
-				bullets[i].update(bulletSpeed);
+			if (bullets[i].exists) {
+				float nextX = bullets[i].getBulletPosX() + bullets[i].getDirX();
+				float nextY = bullets[i].getBulletPosY() + bullets[i].getDirY();
+				
+				if (!mapFactory.isBlocked(nextX, nextY) && !BulletCollision(bullets, enemies)) {
+					bullets[i].update(bulletSpeed);
+				}
+				else if (mapFactory.isBlocked(nextX, nextY)){
+					bullets[i].destroyBullet();
+					System.out.println("Wall Hit");
+				}
 			}
-			//bullets[i].update(bulletSpeed);
 		}
 
 		if (curBulletFireTimer < bulletFireRate) {
@@ -154,7 +160,7 @@ public class BulletFactory {
 						System.out.println("Bullet Collision? w/ Enemy " +i);
 						collision = true;
 						
-						enemies[i].destroyEntity();
+						enemies[i].getHit();
 						bullets[b].destroyBullet();
 					}
 				}

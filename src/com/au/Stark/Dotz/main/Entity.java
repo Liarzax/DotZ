@@ -1,7 +1,5 @@
 package com.au.Stark.Dotz.main;
 
-import java.util.Random;
-
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -10,7 +8,7 @@ import org.newdawn.slick.geom.Rectangle;
 public class Entity {
 
 	// Init Sprite
-	Animation sprite, up, down, left, right, idle; // needs idle image for shits n giggles.
+	Animation sprite, up, down, left, right, idle, lDeath, uDeath, rDeath, dDeath; // needs idle image for shits n giggles.
 	// sprite location
 	float x = 0f, y = 0f;
 	int faceingX = 0;
@@ -20,6 +18,8 @@ public class Entity {
 	// Temp Bounding Box Info for Testing
 	Rectangle rec = new Rectangle(x, y, 32f, 32f);
 	boolean dead = false;
+	// health
+	private int health = 3;
 	
 	// spawn location
 	float spawnX = 0f, spawnY = 0f;
@@ -32,9 +32,9 @@ public class Entity {
 	float walkSpeed = 0.05f;
 
 	// random number generator.
-	Random randomGenerator = new Random();
+	//Random randomGenerator = new Random();
 	// 0 - 199
-	int rand = 0;
+	//int rand = 0;
 	// randomGenerator.nextInt(200);
 
 	// map height & width - find a way tp fix this later
@@ -68,6 +68,7 @@ public class Entity {
 		idleWonder();
 
 		// sprite image / zombie style | currently 2 dif zombie types
+		// big - little should equal this number --^ of zombies to select from.
 		int R = (int) ((Math.random() * (3 - 1)) + 1); 
 		//Load Sprite
 		Image [] movementUp = {new Image("assets/zomb"+R+"_UD1.png"), new Image("assets/zomb"+R+"_UD2.png"),
@@ -83,9 +84,9 @@ public class Entity {
 				new Image("assets/zomb"+R+"_UD3.png"), new Image("assets/zomb"+R+"_UD4.png"), new Image("assets/zomb"+R+"_UD5.png"), 
 				new Image("assets/zomb"+R+"_UD6.png"), new Image("assets/zomb"+R+"_UD7.png"), new Image("assets/zomb"+R+"_UD8.png")};
 		
-		// Idle ImageUD & LR? man, there has to be a way to rotate this stuff.
-		/*Image [] idle = {new Image("assets/zomb"+R+"_UD1.png")};
-		idle[1].rotate(2f);*/
+		// lDeath, uDeath, rDeath, dDeath
+		
+		// Rotate each image in the Animation
 		for (int i = 0; i< movementUp.length; i++) {
 			movementDown[i].rotate(180f);
 			movementLeft[i].rotate(270f);
@@ -99,6 +100,7 @@ public class Entity {
 		left = new Animation(movementLeft, duration, false);
 		right = new Animation(movementRight, duration, false); 
 		// idle Image
+		// death animations
 
 		// Starting orientation of the sprite.
 		sprite = left;
@@ -114,50 +116,53 @@ public class Entity {
 		float nextX = 0;
 		float nextY = 0;
 		
-		if (needGoUp) {
-			sprite = up;
-			nextX = x+spritePicSize;
-			nextY = (y+spritePicSize) - delta * collisionPaddingDistance;
-			if (!mapFactory.isBlocked(nextX, nextY)) {
-				//sprite.update(delta);
-				moveUp(delta);
+		if (!dead) {
+			if (needGoUp) {
+				sprite = up;
+				nextX = x+spritePicSize;
+				nextY = (y+spritePicSize) - delta * collisionPaddingDistance;
+				if (!mapFactory.isBlocked(nextX, nextY)) {
+					//sprite.update(delta);
+					moveUp(delta);
+				}
 			}
-		}
-
-		if (needGoDown) {
-			sprite = down;
-			nextX = x+spritePicSize;
-			nextY = (y+spritePicSize) + delta * collisionPaddingDistance;
-			if (!mapFactory.isBlocked(nextX, nextY)) {
-				//sprite.update(delta);
-				moveDown(delta);
+	
+			if (needGoDown) {
+				sprite = down;
+				nextX = x+spritePicSize;
+				nextY = (y+spritePicSize) + delta * collisionPaddingDistance;
+				if (!mapFactory.isBlocked(nextX, nextY)) {
+					//sprite.update(delta);
+					moveDown(delta);
+				}
 			}
-		}
-
-		if (needGoLeft) {
-			sprite = left;
-			nextX = (x+spritePicSize) - delta * collisionPaddingDistance;
-			nextY = y+spritePicSize;
-			if (!mapFactory.isBlocked(nextX, nextY)) {
-				//sprite.update(delta);
-				moveLeft(delta);
+	
+			if (needGoLeft) {
+				sprite = left;
+				nextX = (x+spritePicSize) - delta * collisionPaddingDistance;
+				nextY = y+spritePicSize;
+				if (!mapFactory.isBlocked(nextX, nextY)) {
+					//sprite.update(delta);
+					moveLeft(delta);
+				}
 			}
-		}
-
-		if (needGoRight) {
-			sprite = right;
-			nextX = (x+spritePicSize) + delta * collisionPaddingDistance;
-			nextY = y+spritePicSize;
-			if (!mapFactory.isBlocked(nextX, nextY)) {
-				//sprite.update(delta);
-				moveRight(delta);
+	
+			if (needGoRight) {
+				sprite = right;
+				nextX = (x+spritePicSize) + delta * collisionPaddingDistance;
+				nextY = y+spritePicSize;
+				if (!mapFactory.isBlocked(nextX, nextY)) {
+					//sprite.update(delta);
+					moveRight(delta);
+				}
 			}
+			
+			// update animation after changes
+			sprite.update(delta);
+			// Move bounding box with player.
+			rec.setX(x);
+			rec.setY(y);
 		}
-		// update animation after changes
-		sprite.update(delta);
-		// Move bounding box with player.
-		rec.setX(x);
-		rec.setY(y);
 
 		// TODO: Seems ok, but needs work!
 		// add idle, maby idle timer, idk, something looks like its missing.
@@ -189,7 +194,10 @@ public class Entity {
 	}
 
 	void render () {
-		sprite.draw((int)x, (int)y);
+		if (!dead) {
+			sprite.draw((int)x, (int)y);
+		}
+		
 	}
 	
 	private void idleWonder() {
@@ -265,10 +273,24 @@ public class Entity {
 		faceingY = 0;
 	}
 	
+	public void getHit() {
+		// play blood splat?
+		health--;
+		System.out.println("BLOOD SPLAT");
+		
+		if (health <= 0) {
+			dead = true;
+			destroyEntity();
+		}
+	}
+	
 	public void destroyEntity() {
-		dead = true;
+		//dead = true;
+		System.out.println("ddeeaaddd blegh");
 		rec.setWidth(0);
 		rec.setHeight(0);
+		// play death animation? lalalala
+		
 	}
 
 }

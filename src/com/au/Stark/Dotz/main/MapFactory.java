@@ -6,7 +6,6 @@ import org.newdawn.slick.tiled.TiledMap;
 
 public class MapFactory {
 
-
 	//Init Map (20x14 Tiles).
 	private TiledMap currentMap;
 	// Map Collision Data
