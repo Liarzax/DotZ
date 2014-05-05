@@ -156,7 +156,7 @@ public class BulletFactory {
 		for (int b = 0; b < curBulletsOnField; b++) {
 			if (bullets[b].exists) {
 				for (int i = 0; i < enemies.length; i++) { 
-					if(bullets[b].rec.intersects(enemies[i].rec) ) { // && !enemies[i].dead) {
+					if(bullets[b].rec.intersects(enemies[i].rec) && !enemies[i].dead) {
 						System.out.println("Bullet Collision? w/ Enemy " +i);
 						collision = true;
 						

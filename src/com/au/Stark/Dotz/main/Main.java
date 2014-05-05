@@ -12,12 +12,12 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 
 public class Main extends BasicGame {
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 15;
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 16;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
-
-	static int width = 640;
-	static int height = 480;
+// slick, lwjgl, nifty-1.3.3, nifty-lwjgl-renderer-1.3.3, lwjgl_util, xpp3-1.1.3.4.c;
+	static int width = 800;
+	static int height = 640;
 
 	static boolean fullscreen = false;
 	static boolean showFPS = true;
@@ -26,6 +26,9 @@ public class Main extends BasicGame {
 
 	// Create mapFactory
 	MapFactory mapFactory = new MapFactory();
+	
+	// Create HUD
+	HUD hud = new HUD();
 
 	// Init Sprite
 	private Animation sprite, up, down, left, right, idleU, idleD, idleL, idleR;
@@ -73,7 +76,9 @@ public class Main extends BasicGame {
 	public void init(GameContainer gc) throws SlickException {
 		//Load Map
 		mapFactory.init();
-
+		// LOAD HUD
+		hud.init();
+		
 		//Load Sprite via Rotation! NOTE: Done but im sure theres a cleaner way to do this!?
 		Image [] movementUp = {new Image("assets/player_UD1.png"), new Image("assets/player_UD2.png"),
 				new Image("assets/player_UD3.png"), new Image("assets/player_UD4.png"), new Image("assets/player_UD5.png"), 
@@ -255,7 +260,7 @@ public class Main extends BasicGame {
 		// Fire!
 		if (Keyboard.isKeyDown(Input.KEY_SPACE) && reloading == false) {
 			if (bulletFactory.curBulletFireTimer >= bulletFactory.bulletFireRate) {
-				bulletFactory.createBullet(sprite,(int)x, (int)y, (int) faceingX, (int) faceingY);
+				bulletFactory.createBullet(sprite,(int)x+centerOfSprite, (int)y+centerOfSprite, (int) faceingX, (int) faceingY);
 			}
 		}
 
@@ -313,6 +318,9 @@ public class Main extends BasicGame {
 		for (int i = 0; i < maxEnemies; i++) {
 			enemies[i].update(delta, mapFactory);
 		}
+		
+		// UPDATE HUD DETAILS
+		hud.update();
 
 	}
 
@@ -330,6 +338,9 @@ public class Main extends BasicGame {
 		for (int i = 0; i < maxEnemies; i++) {
 			enemies[i].render();
 		}
+		
+		// RENDER HUD DETAILS
+		hud.render();
 
 	}
 	

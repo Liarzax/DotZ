@@ -9,6 +9,9 @@ public class Entity {
 
 	// Init Sprite
 	Animation sprite, up, down, left, right, idle, lDeath, uDeath, rDeath, dDeath; // needs idle image for shits n giggles.
+	Animation idleU, idleD, idleL, idleR;
+	// Damage Animations
+	Animation spriteDamage, bloodSplat1;
 	// sprite location
 	float x = 0f, y = 0f;
 	int faceingX = 0;
@@ -30,6 +33,10 @@ public class Entity {
 	// Base walk speed 0.05f?
 	float curWalkSpeed = 0.04f;
 	float walkSpeed = 0.05f;
+	
+	int idleTimerCur = 0;
+	int idleTimerMin = 280;
+	int idleTimerMax = 350;
 
 	// random number generator.
 	//Random randomGenerator = new Random();
@@ -44,7 +51,7 @@ public class Entity {
 	// movement passes, to make it smother.
 	int pass = 0;
 	// direction need to go
-	boolean needGoUp = false, needGoLeft = false, needGoDown = false, needGoRight = false;
+	boolean needGoUp = false, needGoLeft = false, needGoDown = false, needGoRight = false, canIdle = false;
 	// direction just moved
 	//boolean justMovedUp = false, justMovedLeft = false, justMovedDown = false, justMovedRight = false;
 
@@ -83,27 +90,93 @@ public class Entity {
 		Image [] movementRight = {new Image("assets/zomb"+R+"_UD1.png"), new Image("assets/zomb"+R+"_UD2.png"),
 				new Image("assets/zomb"+R+"_UD3.png"), new Image("assets/zomb"+R+"_UD4.png"), new Image("assets/zomb"+R+"_UD5.png"), 
 				new Image("assets/zomb"+R+"_UD6.png"), new Image("assets/zomb"+R+"_UD7.png"), new Image("assets/zomb"+R+"_UD8.png")};
+		// Idle Animations
+		Image [] movementIdleU = {new Image("assets/zomb"+R+"_iD1.png")};
+		Image [] movementIdleD = {new Image("assets/zomb"+R+"_iD1.png")};
+		Image [] movementIdleL = {new Image("assets/zomb"+R+"_iD1.png")};
+		Image [] movementIdleR = {new Image("assets/zomb"+R+"_iD1.png")};
+		// TODO: / COULD REPLACE THIS SHIT WITH A SIMPLE == eg deathLeft = deathUp.
+		// lDeath, uDeath, rDeath, dDeath - 
+		Image [] deathUp = {new Image("assets/zomb"+R+"_Death1.png"), new Image("assets/zomb"+R+"_Death2.png"),
+				new Image("assets/zomb"+R+"_Death3.png"), new Image("assets/zomb"+R+"_Death4.png"), new Image("assets/zomb"+R+"_Death5.png"), 
+				new Image("assets/zomb"+R+"_Death6.png"), new Image("assets/zomb"+R+"_Death7.png"), new Image("assets/zomb"+R+"_Death8.png")};
+		Image [] deathDown = {new Image("assets/zomb"+R+"_Death1.png"), new Image("assets/zomb"+R+"_Death2.png"),
+				new Image("assets/zomb"+R+"_Death3.png"), new Image("assets/zomb"+R+"_Death4.png"), new Image("assets/zomb"+R+"_Death5.png"), 
+				new Image("assets/zomb"+R+"_Death6.png"), new Image("assets/zomb"+R+"_Death7.png"), new Image("assets/zomb"+R+"_Death8.png")};
+		Image [] deathLeft = {new Image("assets/zomb"+R+"_Death1.png"), new Image("assets/zomb"+R+"_Death2.png"),
+				new Image("assets/zomb"+R+"_Death3.png"), new Image("assets/zomb"+R+"_Death4.png"), new Image("assets/zomb"+R+"_Death5.png"), 
+				new Image("assets/zomb"+R+"_Death6.png"), new Image("assets/zomb"+R+"_Death7.png"), new Image("assets/zomb"+R+"_Death8.png")};
+		Image [] deathRight = {new Image("assets/zomb"+R+"_Death1.png"), new Image("assets/zomb"+R+"_Death2.png"),
+				new Image("assets/zomb"+R+"_Death3.png"), new Image("assets/zomb"+R+"_Death4.png"), new Image("assets/zomb"+R+"_Death5.png"), 
+				new Image("assets/zomb"+R+"_Death6.png"), new Image("assets/zomb"+R+"_Death7.png"), new Image("assets/zomb"+R+"_Death8.png")};
 		
-		// lDeath, uDeath, rDeath, dDeath
+		// load damage Animations
+		Image [] hitBloodSplat1 = {new Image("assets/bloodSplat4.png"), new Image("assets/bloodSplat1.png"),
+				new Image("assets/bloodSplat1.png"), new Image("assets/bloodSplat2.png"), new Image("assets/bloodSplat2.png"), 
+				new Image("assets/bloodSplat3.png"), new Image("assets/bloodSplat4.png"), new Image("assets/bloodSplat5.png")};
 		
-		// Rotate each image in the Animation
+		// Rotate each movement image in the Animation
 		for (int i = 0; i< movementUp.length; i++) {
 			movementDown[i].rotate(180f);
 			movementLeft[i].rotate(270f);
 			movementRight[i].rotate(90f);
 		}
+		// rotate each idle image
+		for (int i = 0; i< movementIdleU.length; i++) {
+			movementIdleD[i].rotate(180f);
+			movementIdleL[i].rotate(270f);
+			movementIdleR[i].rotate(90f);
+		}
+		// rotate each death image in the animation
+		for (int i = 0; i< deathUp.length; i++) {
+			deathDown[i].rotate(180f);
+			deathLeft[i].rotate(270f);
+			deathRight[i].rotate(90f);
+		}
 		
-		int [] duration = {200, 200, 200, 200, 200, 200, 200, 200};
+		int [] idleDur 			= {200};
+		int [] duration	 		= {200, 200, 200, 200, 200, 200, 200, 200};
+		int [] deathDuration	 		= {200, 200, 200, 200, 200, 200, 200, 200};
+		int [] damageDuration 	= {200, 50, 50, 50, 50, 50, 50, 200};
 
 		up = new Animation(movementUp, duration, false);
 		down = new Animation(movementDown, duration, false);
 		left = new Animation(movementLeft, duration, false);
 		right = new Animation(movementRight, duration, false); 
 		// idle Image
-		// death animations
+		idleU = new Animation(movementIdleU, idleDur, false);
+		idleD = new Animation(movementIdleD, idleDur, false);
+		idleL = new Animation(movementIdleL, idleDur, false);
+		idleR = new Animation(movementIdleR, idleDur, false);
+		// Death animations
+		// TODO: Replace with DEATH ANIMATIONS
+		uDeath = new Animation(deathUp, deathDuration, false);
+		dDeath = new Animation(deathDown, deathDuration, false);
+		lDeath = new Animation(deathLeft, deathDuration, false);
+		rDeath = new Animation(deathRight, deathDuration, false);
+		// Damage Animations
+		bloodSplat1 = new Animation(hitBloodSplat1, damageDuration, false);
 
 		// Starting orientation of the sprite.
-		sprite = left;
+		R = (int) ((Math.random() * (5 - 1)) + 1); 
+		if (R == 1) {
+			sprite = idleU;
+		}
+		if (R == 2) {
+			sprite = idleD;
+		}
+		if (R == 3) {
+			sprite = idleL;
+		}
+		if (R == 4) {
+			sprite = idleR;
+		}
+		
+		// TODO STOP THIS FROM PLAYING IMEDIETLY
+		spriteDamage = bloodSplat1;
+		//spriteDamage.stopAt(8);
+		spriteDamage.setCurrentFrame(7);
+		//spriteDamage.stopAt(7);
 	}
 
 	void update(int delta, MapFactory mapFactory) {
@@ -124,6 +197,10 @@ public class Entity {
 				if (!mapFactory.isBlocked(nextX, nextY)) {
 					//sprite.update(delta);
 					moveUp(delta);
+					needGoUp = true;
+				}
+				else {
+					needGoUp = false;
 				}
 			}
 	
@@ -134,6 +211,10 @@ public class Entity {
 				if (!mapFactory.isBlocked(nextX, nextY)) {
 					//sprite.update(delta);
 					moveDown(delta);
+					needGoDown = true;
+				}
+				else {
+					needGoDown = false;
 				}
 			}
 	
@@ -144,6 +225,10 @@ public class Entity {
 				if (!mapFactory.isBlocked(nextX, nextY)) {
 					//sprite.update(delta);
 					moveLeft(delta);
+					needGoLeft = true;
+				}
+				else {
+					needGoLeft = false;
 				}
 			}
 	
@@ -154,14 +239,47 @@ public class Entity {
 				if (!mapFactory.isBlocked(nextX, nextY)) {
 					//sprite.update(delta);
 					moveRight(delta);
+					needGoRight = true;
+				}
+				else {
+					needGoRight = false;
 				}
 			}
 			
-			// update animation after changes
-			sprite.update(delta);
+			if (!needGoLeft && !needGoRight && !needGoUp && !needGoDown) {
+				if (faceingX == 1) {
+					sprite = idleR;
+				}
+				if (faceingX == -1) {
+					sprite = idleL;	
+				}
+				if (faceingY == 1) {
+					sprite = idleD;
+				}
+				if (faceingY == -1) {
+					sprite = idleU;
+				}
+			}
+						
 			// Move bounding box with player.
 			rec.setX(x);
 			rec.setY(y);
+			
+			// update animation after changes
+			/*sprite.update(delta);
+			spriteDamage.update(delta);
+			spriteDamage.setLooping(false);*/
+			//sprite.update(delta);
+			
+		}
+		// maby need to put the update here? so the dead animation plays.
+		// update animation after changes
+		//sprite.update(delta);
+		sprite.update(delta);
+		spriteDamage.update(delta);
+		spriteDamage.setLooping(false);
+		if(dead) {
+			sprite.setLooping(false);
 		}
 
 		// TODO: Seems ok, but needs work!
@@ -169,8 +287,9 @@ public class Entity {
 		// int R = (Math.random() * (100 - 10)) + 10; 
 		// This gives you a random number in between 10 (inclusive) and 100 (exclusive)
 		
-		int R = (int) ((Math.random() * (150 - 60)) + 60); 
-		if(pass > R) {
+		//int R = (int) ((Math.random() * (idleTimerMax - idleTimerMin)) + idleTimerMin); 
+		//if(pass > R) {
+		if(pass > idleTimerCur) {
 			needGoUp = false;
 			needGoLeft = false;
 			needGoDown = false;
@@ -195,10 +314,16 @@ public class Entity {
 
 	void render () {
 		if (!dead) {
-			sprite.draw((int)x, (int)y);
+			//sprite.draw((int)x, (int)y);
+			// TODO Need to add change to damage render location
+			bloodSplat1.draw(x, y);
 		}
-		
+		sprite.draw((int)x, (int)y);
 	}
+	
+	/*void renderDamage () {
+		bloodSplat1.draw(x, y);
+	}*/
 	
 	private void idleWonder() {
 		//System.out.println("Setting New Destination");
@@ -242,6 +367,7 @@ public class Entity {
 		}
 		
 		//System.out.println("DestX = "+destX+" DestY = "+destY);
+		idleTimerCur = (int) ((Math.random() * (idleTimerMax - idleTimerMin)) + idleTimerMin);
 
 	}
 
@@ -275,6 +401,10 @@ public class Entity {
 	
 	public void getHit() {
 		// play blood splat?
+		// register bloodsplat, then play it in the render?
+		//bloodSplat1.draw(x, y);
+		spriteDamage.restart();
+		
 		health--;
 		System.out.println("BLOOD SPLAT");
 		
@@ -286,9 +416,25 @@ public class Entity {
 	
 	public void destroyEntity() {
 		//dead = true;
+		// TODO: replace with death animations
+		if (faceingX == 1) {
+			sprite = rDeath;
+		}
+		if (faceingX == -1) {
+			sprite = lDeath;
+		}
+		if (faceingY == 1) {
+			sprite = dDeath;
+		}
+		if (faceingY == -1) {
+			sprite = uDeath;
+		}
+		
+		sprite.restart();
+		sprite.stopAt(7);
 		System.out.println("ddeeaaddd blegh");
-		rec.setWidth(0);
-		rec.setHeight(0);
+		/*rec.setWidth(0);
+		rec.setHeight(0);*/
 		// play death animation? lalalala
 		
 	}
