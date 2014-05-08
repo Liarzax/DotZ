@@ -12,7 +12,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 
 public class Main extends BasicGame {
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 16;
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 17;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 // slick, lwjgl, nifty-1.3.3, nifty-lwjgl-renderer-1.3.3, lwjgl_util, xpp3-1.1.3.4.c;
@@ -356,6 +356,7 @@ public class Main extends BasicGame {
 		// NOTE; if intersected push that shit outa the way
 		for (int i = 0; i < enemies.length; i++) { 
 			if(rec.intersects(enemies[i].rec) && !enemies[i].dead) {
+				
 				System.out.println("Possible Collision? w/ Enemy " +i);
 				collision = true;
 			}

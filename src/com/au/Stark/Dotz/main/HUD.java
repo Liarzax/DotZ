@@ -1,10 +1,10 @@
 package com.au.Stark.Dotz.main;
 
-import de.lessvoid.nifty.Nifty;
+//import de.lessvoid.nifty.Nifty;
 
 public class HUD {
 	
-	Nifty nifty;
+	//Nifty nifty;
 	
 	public HUD() {
 		
