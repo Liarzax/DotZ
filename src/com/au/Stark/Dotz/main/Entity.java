@@ -13,30 +13,20 @@ public class Entity {
 	// Damage Animations
 	Animation spriteDamage, bloodSplat1;
 	// sprite location
-	float x = 0f, y = 0f;
-	int faceingX = 0;
-	int faceingY = 0;
+	float curX = 0f, curY = 0f, nextX = 0, nextY = 0, spawnX = 0f, spawnY = 0f, destX = 0, destY = 0;
+	int faceingX = 0, faceingY = 0, health = 3;
 	// sprite size
-	int spritePicSize = 16;
+	int centerOfSprite = 16;
 	// Temp Bounding Box Info for Testing
-	Rectangle rec = new Rectangle(x, y, 32f, 32f);
+	Rectangle rec = new Rectangle(curX, curY, 32f, 32f);
 	boolean dead = false;
-	// health
-	private int health = 3;
 	
-	// spawn location
-	float spawnX = 0f, spawnY = 0f;
-
-	float destX = 0, destY = 0;
-
 	float runSpeed = 0.8f;
 	// Base walk speed 0.05f?
 	float curWalkSpeed = 0.04f;
 	float walkSpeed = 0.05f;
 	
-	int idleTimerCur = 0;
-	int idleTimerMin = 280;
-	int idleTimerMax = 350;
+	int idleTimerCur = 0, idleTimerMin = 280, idleTimerMax = 350;
 
 	// random number generator.
 	//Random randomGenerator = new Random();
@@ -45,8 +35,7 @@ public class Entity {
 	// randomGenerator.nextInt(200);
 
 	// map height & width - find a way tp fix this later
-	int mapWidth = 640;
-	int mapHeight = 480;
+	int mapWidth = 640, mapHeight = 480;
 
 	// movement passes, to make it smother.
 	int pass = 0;
@@ -56,7 +45,10 @@ public class Entity {
 	//boolean justMovedUp = false, justMovedLeft = false, justMovedDown = false, justMovedRight = false;
 
 	// temp for collision
-	private float collisionPaddingDistance = 0.95f;
+	//private 
+	float collisionPaddingDistance = 0.95f;
+	int entID = 0;
+	public boolean reloading = false;
 
 	public Entity() {
 
@@ -64,8 +56,8 @@ public class Entity {
 
 	void initEntity(int locationX, int locationY) throws SlickException {
 		// spawn at
-		x = locationX;
-		y = locationY;
+		curX = locationX;
+		curY = locationY;
 		// set original spawn location
 		spawnX = locationX;
 		spawnY = locationY;
@@ -192,8 +184,8 @@ public class Entity {
 		if (!dead) {
 			if (needGoUp) {
 				sprite = up;
-				nextX = x+spritePicSize;
-				nextY = (y+spritePicSize) - delta * collisionPaddingDistance;
+				nextX = curX+centerOfSprite;
+				nextY = (curY+centerOfSprite) - delta * collisionPaddingDistance;
 				if (!mapFactory.isBlocked(nextX, nextY)) {
 					//sprite.update(delta);
 					moveUp(delta);
@@ -206,8 +198,8 @@ public class Entity {
 	
 			if (needGoDown) {
 				sprite = down;
-				nextX = x+spritePicSize;
-				nextY = (y+spritePicSize) + delta * collisionPaddingDistance;
+				nextX = curX+centerOfSprite;
+				nextY = (curY+centerOfSprite) + delta * collisionPaddingDistance;
 				if (!mapFactory.isBlocked(nextX, nextY)) {
 					//sprite.update(delta);
 					moveDown(delta);
@@ -220,8 +212,8 @@ public class Entity {
 	
 			if (needGoLeft) {
 				sprite = left;
-				nextX = (x+spritePicSize) - delta * collisionPaddingDistance;
-				nextY = y+spritePicSize;
+				nextX = (curX+centerOfSprite) - delta * collisionPaddingDistance;
+				nextY = curY+centerOfSprite;
 				if (!mapFactory.isBlocked(nextX, nextY)) {
 					//sprite.update(delta);
 					moveLeft(delta);
@@ -234,8 +226,8 @@ public class Entity {
 	
 			if (needGoRight) {
 				sprite = right;
-				nextX = (x+spritePicSize) + delta * collisionPaddingDistance;
-				nextY = y+spritePicSize;
+				nextX = (curX+centerOfSprite) + delta * collisionPaddingDistance;
+				nextY = curY+centerOfSprite;
 				if (!mapFactory.isBlocked(nextX, nextY)) {
 					//sprite.update(delta);
 					moveRight(delta);
@@ -262,8 +254,8 @@ public class Entity {
 			}
 						
 			// Move bounding box with player.
-			rec.setX(x);
-			rec.setY(y);
+			rec.setX(curX);
+			rec.setY(curY);
 			
 			// update animation after changes
 			/*sprite.update(delta);
@@ -316,9 +308,9 @@ public class Entity {
 		if (!dead) {
 			//sprite.draw((int)x, (int)y);
 			// TODO Need to add change to damage render location
-			bloodSplat1.draw(x, y);
+			bloodSplat1.draw(curX, curY);
 		}
-		sprite.draw((int)x, (int)y);
+		sprite.draw((int)curX, (int)curY);
 	}
 	
 	/*void renderDamage () {
@@ -337,10 +329,10 @@ public class Entity {
 				xSet = true;
 			}
 			
-			if (destX < x) {
+			if (destX < curX) {
 				needGoLeft = true;
 			}
-			else if (destX > x) {
+			else if (destX > curX) {
 				needGoRight = true;
 			}
 			else {
@@ -355,10 +347,10 @@ public class Entity {
 				ySet = true;
 			}
 			
-			if (destY < y) {
+			if (destY < curY) {
 				needGoUp = true;
 			}
-			else if (destY > y) {
+			else if (destY > curY) {
 				needGoDown = true;
 			}
 			else {
@@ -373,28 +365,28 @@ public class Entity {
 
 	private void moveUp(int delta) {
 		sprite = up;
-		y -= delta * curWalkSpeed;
+		curY -= delta * curWalkSpeed;
 		faceingX = 0;
 		faceingY = -1;
 	}
 
 	private void moveDown(int delta) {
 		sprite = down;
-		y += delta * curWalkSpeed;
+		curY += delta * curWalkSpeed;
 		faceingX = 0;
 		faceingY = 1;
 	}
 
 	private void moveLeft(int delta) {
 		sprite = left;
-		x -= delta * curWalkSpeed;
+		curX -= delta * curWalkSpeed;
 		faceingX = -1;
 		faceingY = 0;
 	}
 
 	private void moveRight(int delta) {
 		sprite = right;
-		x += delta * curWalkSpeed;
+		curX += delta * curWalkSpeed;
 		faceingX = 1;
 		faceingY = 0;
 	}
