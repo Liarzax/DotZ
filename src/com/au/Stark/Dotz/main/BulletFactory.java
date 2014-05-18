@@ -1,6 +1,8 @@
 package com.au.Stark.Dotz.main;
 
 import org.newdawn.slick.Animation;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
@@ -104,10 +106,21 @@ public class BulletFactory {
 		}
 	}
 
-	public void renderBullets() {
+	public void renderBullets(Graphics g, boolean debug) {
 		for (int i = 0; i < curBulletsOnField; i++) {
 			bullets[i].render();
+			
+			if (debug) {
+				renderDebug(bullets[i], g);
+			}
 		}
+	}
+	
+	void renderDebug(Bullet b, Graphics g) {
+		// Draw Collision Boxes.
+		g.setColor(new Color(0f,0f,1f,1f));
+		g.drawRect(b.rec.getX(), b.rec.getY(), b.rec.getWidth(), b.rec.getHeight());
+		
 	}
 
 	public int getBulletFireRate() {

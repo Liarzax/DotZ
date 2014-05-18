@@ -1,9 +1,15 @@
 package com.au.Stark.Dotz.main;
 
+import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Animation;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Shape;
 
 public class Entity {
 
@@ -13,36 +19,41 @@ public class Entity {
 	// Damage Animations
 	Animation spriteDamage, bloodSplat1;
 	// sprite location
-	float curX = 0f, curY = 0f, nextX = 0, nextY = 0, spawnX = 0f, spawnY = 0f, destX = 0, destY = 0;
+	float curX = 0f, curY = 0f, nextMapX = 0, nextMapY = 0, spawnX = 0f, spawnY = 0f, destX = 0, destY = 0, nextX = 0, nextY = 0;
 	int faceingX = 0, faceingY = 0, health = 3;
-	// sprite size
+	// sprite size - Later find away to just get this from the image & set center also eventuly
+	int spriteSize = 32;
 	int centerOfSprite = 16;
 	// Temp Bounding Box Info for Testing
-	Rectangle rec = new Rectangle(curX, curY, 32f, 32f);
-	boolean dead = false;
+	Rectangle rec = new Rectangle(curX, curY, spriteSize, spriteSize);
+	boolean dead = false, visible = true, ai = false, aiFollow = false;
 	
-	float runSpeed = 0.8f;
+	/*float runSpeed = 0.8f;
 	// Base walk speed 0.05f?
 	float curWalkSpeed = 0.04f;
-	float walkSpeed = 0.05f;
+	float walkSpeed = 0.05f;*/
+	
+	float Velocity = 0, acceleration = 0.04f, maxSpeed = 0.04f;
+	//float curSpeed = 0;
 	
 	int idleTimerCur = 0, idleTimerMin = 280, idleTimerMax = 350;
-
-	// random number generator.
-	//Random randomGenerator = new Random();
-	// 0 - 199
-	//int rand = 0;
-	// randomGenerator.nextInt(200);
-
+	
+	// Sight Range?
+	//Shape circle = new Circle(curX+15,curY+15,50);
+	// 50 is nice and close, but not enough for vision.
+	float sightRange = 50f;
+	Circle sightRadius = new Circle(curX, curY, sightRange);;
+	
+	
 	// map height & width - find a way tp fix this later
-	int mapWidth = 640, mapHeight = 480;
+	//int mapWidth = 640, mapHeight = 480;
+	int mapWidth = 800, mapHeight = 640;
+	
 
 	// movement passes, to make it smother.
 	int pass = 0;
 	// direction need to go
 	boolean needGoUp = false, needGoLeft = false, needGoDown = false, needGoRight = false, canIdle = false;
-	// direction just moved
-	//boolean justMovedUp = false, justMovedLeft = false, justMovedDown = false, justMovedRight = false;
 
 	// temp for collision
 	//private 
@@ -58,6 +69,14 @@ public class Entity {
 		// spawn at
 		curX = locationX;
 		curY = locationY;
+		nextX = locationX;
+		nextY = locationY;
+		// Initialize collision ranges
+		rec.setCenterX(curX + centerOfSprite);
+		rec.setCenterY(curY + centerOfSprite);
+		sightRadius.setCenterX(curX + centerOfSprite);
+		sightRadius.setCenterY(curY + centerOfSprite);
+		
 		// set original spawn location
 		spawnX = locationX;
 		spawnY = locationY;
@@ -164,6 +183,12 @@ public class Entity {
 			sprite = idleR;
 		}
 		
+		// maby one for the rec for collisions later
+		
+		// set the sight radius
+		//sightRadius = new Circle(curX, curY, sightRange);
+		
+		
 		// TODO STOP THIS FROM PLAYING IMEDIETLY
 		spriteDamage = bloodSplat1;
 		//spriteDamage.stopAt(8);
@@ -253,20 +278,16 @@ public class Entity {
 				}
 			}
 						
-			// Move bounding box with player.
-			rec.setX(curX);
-			rec.setY(curY);
-			
-			// update animation after changes
-			/*sprite.update(delta);
-			spriteDamage.update(delta);
-			spriteDamage.setLooping(false);*/
-			//sprite.update(delta);
-			
+			// Move bounding box with entity.
+			rec.setCenterX(curX + centerOfSprite);
+			rec.setCenterY(curY + centerOfSprite);
+			// move sight with entity
+			sightRadius.setCenterX(curX + centerOfSprite);
+			sightRadius.setCenterY(curY + centerOfSprite);
+						
 		}
-		// maby need to put the update here? so the dead animation plays.
+
 		// update animation after changes
-		//sprite.update(delta);
 		sprite.update(delta);
 		spriteDamage.update(delta);
 		spriteDamage.setLooping(false);
@@ -279,8 +300,6 @@ public class Entity {
 		// int R = (Math.random() * (100 - 10)) + 10; 
 		// This gives you a random number in between 10 (inclusive) and 100 (exclusive)
 		
-		//int R = (int) ((Math.random() * (idleTimerMax - idleTimerMin)) + idleTimerMin); 
-		//if(pass > R) {
 		if(pass > idleTimerCur) {
 			needGoUp = false;
 			needGoLeft = false;
@@ -294,23 +313,38 @@ public class Entity {
 			
 			pass = 0;
 			
-			/*justMovedUp = false;
-			justMovedLeft = false;
-			justMovedDown = false;
-			justMovedRight = false;*/
 		}
 		pass++;
 		//System.out.println("Pass "+pass+" Done!");
 
 	}
 
-	void render () {
+	void render (Graphics g, Boolean debug) {
 		if (!dead) {
 			//sprite.draw((int)x, (int)y);
 			// TODO Need to add change to damage render location
 			bloodSplat1.draw(curX, curY);
+			
+			if (debug) {
+				renderDebug(g);
+			}
 		}
 		sprite.draw((int)curX, (int)curY);
+	}
+	
+	void renderDebug(Graphics g) {
+		// Draw Collision Boxes.
+		g.setColor(Color.blue);
+		g.draw(rec);
+		
+		// Render Sight Range.
+		g.setColor(Color.white);
+		g.draw(sightRadius);
+		
+		// Render Sight Cone? -^ could change that to a cone instead of full 360* vision, lol.
+		
+		
+		
 	}
 	
 	/*void renderDamage () {
@@ -325,7 +359,7 @@ public class Entity {
 		// set dest x 
 		while (!xSet) {
 			destX = (int) ((Math.random() * ((spawnX*1.2) - (spawnX*0.2))) + (spawnX*0.2)); 
-			if (destX < (mapWidth -1) && destX > (mapWidth - (mapWidth +1))) {
+			if (destX < (mapWidth -1) && destX > 1) {
 				xSet = true;
 			}
 			
@@ -343,7 +377,7 @@ public class Entity {
 		// set dest y
 		while (!ySet) {
 			destY = (int) ((Math.random() * ((spawnY*1.2) - (spawnY*0.2))) + (spawnY*0.2)); 
-			if (destY < (mapHeight -1) && destY > (mapHeight - (mapHeight +1))) {
+			if (destY < (mapHeight -1) && destY > 1) {
 				ySet = true;
 			}
 			
@@ -365,28 +399,56 @@ public class Entity {
 
 	private void moveUp(int delta) {
 		sprite = up;
-		curY -= delta * curWalkSpeed;
+		//curY -= delta * curWalkSpeed;
+		Velocity = Velocity + acceleration;
+		if(Velocity  > maxSpeed){
+			Velocity  = maxSpeed;
+		}
+
+		curY -= delta * Velocity;
+		
 		faceingX = 0;
 		faceingY = -1;
 	}
 
 	private void moveDown(int delta) {
 		sprite = down;
-		curY += delta * curWalkSpeed;
+		//curY += delta * curWalkSpeed;
+		Velocity = Velocity + acceleration;
+		if(Velocity  > maxSpeed){
+			Velocity  = maxSpeed;
+		}
+
+		curY += delta * Velocity;
+		
 		faceingX = 0;
 		faceingY = 1;
 	}
 
 	private void moveLeft(int delta) {
 		sprite = left;
-		curX -= delta * curWalkSpeed;
+		//curX -= delta * curWalkSpeed;
+		Velocity = Velocity + acceleration;
+		if(Velocity  > maxSpeed){
+			Velocity  = maxSpeed;
+		}
+
+		curX -= delta * Velocity;
+		
 		faceingX = -1;
 		faceingY = 0;
 	}
 
 	private void moveRight(int delta) {
 		sprite = right;
-		curX += delta * curWalkSpeed;
+		//curX += delta * curWalkSpeed;
+		Velocity = Velocity + acceleration;
+		if(Velocity  > maxSpeed){
+			Velocity  = maxSpeed;
+		}
+
+		curX += delta * Velocity;
+		
 		faceingX = 1;
 		faceingY = 0;
 	}
@@ -425,10 +487,96 @@ public class Entity {
 		sprite.restart();
 		sprite.stopAt(7);
 		System.out.println("ddeeaaddd blegh");
-		/*rec.setWidth(0);
-		rec.setHeight(0);*/
-		// play death animation? lalalala
 		
+	}
+	
+	public void attemptPlayerUp(int delta) {
+		sprite = up;
+		canIdle = false;
+		
+		handlePlayerUp(delta);
+	}
+	public void attemptPlayerDown(int delta) {
+		sprite = down;
+		canIdle = false;
+		
+		handlePlayerDown(delta);
+	}
+	public void attemptPlayerLeft(int delta) {
+		sprite = left;
+		canIdle = false;
+		
+		handlePlayerLeft(delta);
+	}
+	public void attemptPlayerRight(int delta) {
+		sprite = right;
+		canIdle = false;
+		
+		handlePlayerRight(delta);
+	}
+	
+	private void handlePlayerUp(int delta) {
+		nextMapX = curX + centerOfSprite;
+		nextMapY = (curY+centerOfSprite) - delta * collisionPaddingDistance;
+		
+		Velocity = Velocity + acceleration;
+		if(Velocity  > maxSpeed){
+			Velocity  = maxSpeed;
+		}
+		// speed = speed + velocity.
+		// nextY = nextY + speed.
+		nextY -= delta * Velocity;
+		rec.setCenterY(nextY);
+
+		faceingX = 0;
+		faceingY = -1;
+	}
+	private void handlePlayerDown(int delta) {
+		nextMapX = curX + centerOfSprite;
+		nextMapY = (curY + centerOfSprite) + delta * collisionPaddingDistance;
+		
+		Velocity = Velocity + acceleration;
+		if(Velocity  > maxSpeed){
+			Velocity  = maxSpeed;
+		}
+		nextY += delta * Velocity;
+		rec.setCenterY(nextY);
+
+		faceingX = 0;
+		faceingY = 1;
+	}
+	private void handlePlayerLeft(int delta) {
+		nextMapX = (curX + centerOfSprite) - delta * collisionPaddingDistance;
+		nextMapY = curY + centerOfSprite;
+		
+		Velocity = Velocity + acceleration;
+		if(Velocity  > maxSpeed){
+			Velocity  = maxSpeed;
+		}
+		nextX -= delta * Velocity;
+		rec.setCenterX(nextX);
+		
+		faceingX = -1;
+		faceingY = 0;
+	}
+	private void handlePlayerRight(int delta) {
+		nextMapX = (curX + centerOfSprite) + delta * collisionPaddingDistance;
+		nextMapY = curY + centerOfSprite;
+		
+		Velocity = Velocity + acceleration;
+		if(Velocity  > maxSpeed){
+			Velocity  = maxSpeed;
+		}
+		nextX += delta * Velocity;
+		rec.setCenterX(nextX);
+		
+		faceingX = 1;
+		faceingY = 0;
+	}
+	
+	public void tempSetPlayerSight(float sight) {
+		this.sightRange = sight;
+		sightRadius = new Circle(curX, curY, sight);
 	}
 
 }
