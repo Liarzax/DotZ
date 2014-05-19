@@ -4,25 +4,30 @@ import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Shape;
 
 public class Main extends BasicGame {
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 17;
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 19;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 // slick, lwjgl, nifty-1.3.3, nifty-lwjgl-renderer-1.3.3, lwjgl_util, xpp3-1.1.3.4.c;
-	static int width = 800;
-	static int height = 640;
+	static int WIDTH = 800;
+	static int HEIGHT = 640;
 
 	static boolean fullscreen = false;
-	static boolean showFPS = true;
 	static String title = "Defence of the Zombopolypse "+version;
 	static int fpslimit = 60;
+	
+	static boolean debug = true;
+	static boolean showFPS = true;
 
 	// Create mapFactory
 	MapFactory mapFactory = new MapFactory();
@@ -31,32 +36,37 @@ public class Main extends BasicGame {
 	HUD hud = new HUD();
 
 	// Init Sprite
-	private Animation sprite, up, down, left, right, idleU, idleD, idleL, idleR;
-	boolean playerIdle = true;
-	// sprite location
-	private float x = 34f, y = 66f;
-	//int playerX[], playerY[];
-	// Bounding box for Sprite - 
-	private Rectangle rec = new Rectangle(x, y, 32f, 32f);
-	// sprite facing
-	int faceingX = 0, faceingY = 0;
+	// party start location
+	private float x = 65f, y = 85f;
+	// ai follow distance
+	private float aiFollowDist = 40f;
 	// movement speed
-	float walkSpeed = 0.05f, runSpeed = 0.08f;
-	// misc
-	float collisionPaddingDistance = 0.90f;
-	// idk, should always be half the sprite size, 32/2 = 16 (this means none of those retarted 16x32 sprites).
-	int centerOfSprite = 16;
-	// reload shit also need animation
-	boolean reloading = false;
+	//float walkSpeed = 0.05f, runSpeed = 0.08f;
 
 	// Pew Pew Details
 	BulletFactory bulletFactory = new BulletFactory();
 
+	// Player
+	private int playerPartySize = 3;
+	Entity[] players = new Entity[playerPartySize];
+	int activePlayer = 0;
+	
 	// temp enemy
 	//Entity enemy = new Entity();
 	private int maxEnemies = 10;
 	Entity[] enemies = new Entity[maxEnemies];
 
+	// collision system
+	CollisionSystem collisionSys = new CollisionSystem();
+	
+	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
+	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
+	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
+	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
+	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
+	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
+	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
+	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
 
 
 	public Main(String title) {
@@ -65,10 +75,12 @@ public class Main extends BasicGame {
 
 	public static void main(String[] args) throws SlickException {
 		AppGameContainer app = new AppGameContainer(new Main(title));
-		app.setDisplayMode(width, height, fullscreen);
+		app.setDisplayMode(WIDTH, HEIGHT, fullscreen);
 		app.setSmoothDeltas(true);
 		app.setTargetFrameRate(fpslimit);
-		app.setShowFPS(showFPS);
+		if (debug) {
+			app.setShowFPS(showFPS);
+		}
 		app.start();
 	}
 
@@ -78,60 +90,11 @@ public class Main extends BasicGame {
 		mapFactory.init();
 		// LOAD HUD
 		hud.init();
-		
-		//Load Sprite via Rotation! NOTE: Done but im sure theres a cleaner way to do this!?
-		Image [] movementUp = {new Image("assets/player_UD1.png"), new Image("assets/player_UD2.png"),
-				new Image("assets/player_UD3.png"), new Image("assets/player_UD4.png"), new Image("assets/player_UD5.png"), 
-				new Image("assets/player_UD6.png"), new Image("assets/player_UD7.png"), new Image("assets/player_UD8.png")};
-		Image [] movementDown = {new Image("assets/player_UD1.png"), new Image("assets/player_UD2.png"),
-				new Image("assets/player_UD3.png"), new Image("assets/player_UD4.png"), new Image("assets/player_UD5.png"), 
-				new Image("assets/player_UD6.png"), new Image("assets/player_UD7.png"), new Image("assets/player_UD8.png")};
-		Image [] movementLeft = {new Image("assets/player_UD1.png"), new Image("assets/player_UD2.png"),
-				new Image("assets/player_UD3.png"), new Image("assets/player_UD4.png"), new Image("assets/player_UD5.png"), 
-				new Image("assets/player_UD6.png"), new Image("assets/player_UD7.png"), new Image("assets/player_UD8.png")};
-		Image [] movementRight = {new Image("assets/player_UD1.png"), new Image("assets/player_UD2.png"),
-				new Image("assets/player_UD3.png"), new Image("assets/player_UD4.png"), new Image("assets/player_UD5.png"), 
-				new Image("assets/player_UD6.png"), new Image("assets/player_UD7.png"), new Image("assets/player_UD8.png")};
-		
-		Image [] movementIdleU = {new Image("assets/player_iD1.png")};
-		Image [] movementIdleD = {new Image("assets/player_iD1.png")};
-		Image [] movementIdleL = {new Image("assets/player_iD1.png")};
-		Image [] movementIdleR = {new Image("assets/player_iD1.png")};
-		
-		for (int i = 0; i < movementUp.length; i++) {
-			movementDown[i].rotate(180f);
-			movementLeft[i].rotate(270f);
-			movementRight[i].rotate(90f);
-		}
-		for (int i = 0; i< movementIdleU.length; i++) {
-			movementIdleD[i].rotate(180f);
-			movementIdleL[i].rotate(270f);
-			movementIdleR[i].rotate(90f);
-		}
-		
-		int [] duration = {200, 200, 200, 200, 200, 200, 200, 200};
-		int [] idleDur = {200};
-
-		up = new Animation(movementUp, duration, false);
-		down = new Animation(movementDown, duration, false);
-		left = new Animation(movementLeft, duration, false);
-		right = new Animation(movementRight, duration, false); 
-		idleU = new Animation(movementIdleU, idleDur, false);
-		idleD = new Animation(movementIdleD, idleDur, false);
-		idleL = new Animation(movementIdleL, idleDur, false);
-		idleR = new Animation(movementIdleR, idleDur, false);
-		// idle animation?
-
-		// spawn orientation of the sprite. It will look right & idle.
-		sprite = idleR;
-		
-		// Sprite size 32x32, tile size 16x16
-		// stuff.
-		
-		
 
 		// Load Bullet.init/constructor, etc	
 		bulletFactory.initBulletFactory();
+		// load collision system
+		collisionSys.initCollisionSystem();
 
 		// temp enemy init.
 		//enemy.initEntity(337, 233);
@@ -142,10 +105,25 @@ public class Main extends BasicGame {
 			
 			enemies[i] = new Entity();
 			enemies[i].initEntity(eStartX, eStartY);
+			enemies[i].entID = i;
+			System.out.println("ent " + (i+1) + " Created!");
 		}
+		
+		//temp party init
+		for (int i = 0; i < playerPartySize; i++) {
+			int eStartX = randNumBetween(((int)x-25), ((int)x+25)); 
+			int eStartY = randNumBetween(((int)y-25), ((int)y+25)); 
+			
+			players[i] = new Entity();
+			players[i].initEntity(eStartX, eStartY);
+			players[i].entID = i;
+			System.out.println("player " + (i+1) + " Created!");
+			
+			players[i].tempSetPlayerSight(150f);
+		}
+		
 	}
 
-	// what the hell is this delta for and where is it from!? fps?? Seconds? MilSeconds? TIMe!?
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		//Temp Quick DEBUG STUFF	       
@@ -159,157 +137,198 @@ public class Main extends BasicGame {
 
 		// TODO - bullshit Collision start		
 		// Move/Check Player
-		float nextX = 0;
-		float nextY = 0;
-		
-		if (Keyboard.isKeyDown(Input.KEY_UP)) {
-			sprite = up;
-			playerIdle = false;
-			
-			nextX = x + centerOfSprite;
-			nextY = (y+centerOfSprite) - delta * collisionPaddingDistance;
-			if (!mapFactory.isBlocked(nextX, nextY) && !entityCollision(nextX, nextY, enemies)){// && entityCollision(x, y, enemies) == false) {
-				sprite.update(delta);
-				// The lower the delta the slower the sprite will move.
-				// LSHIFT to run, sucka!
-				if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
-					y -= delta * runSpeed;
-				else
-					y -= delta * walkSpeed;
+		//float nextX = 0;
+		//float nextY = 0;
+		// Set cur active char
+		if (Keyboard.isKeyDown(Keyboard.KEY_1))
+			activePlayer = 0;
+		if (Keyboard.isKeyDown(Keyboard.KEY_2))
+			activePlayer = 1;
+		if (Keyboard.isKeyDown(Keyboard.KEY_3))
+			activePlayer = 2;
+		//activate ai for current unit - later do shit like, follow on/off, auto fire on/off, etc...
+		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+			if (players[activePlayer].ai == true) {
+				players[activePlayer].ai = false;
+				System.out.println("AI for Unit "+ (activePlayer+1) +" Activated!");
 			}
 			else {
-				// put a thing that checks if player is closer to this side, then go -- that way else -- other way.
-				y++;
-				
+				players[activePlayer].ai = true;
+				System.out.println("AI for Unit "+ (activePlayer+1) +" De-Activated!");
 			}
+		}
+		//activate ai follow mode
+		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
+			if (players[activePlayer].aiFollow == true) {
+				players[activePlayer].aiFollow = false;
+				System.out.println("AI Following for Unit "+ (activePlayer+1) +" Activated!");
+			}
+			else {
+				players[activePlayer].aiFollow = true;
+				System.out.println("AI Followingfor Unit "+ (activePlayer+1) +" De-Activated!");
+			}
+		}
 			
-			faceingX = 0;
-			faceingY = -1;
+		
+		if (Keyboard.isKeyDown(Input.KEY_UP)) {
+			players[activePlayer].attemptPlayerUp(delta);
+
+			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
+				players[activePlayer].sprite.update(delta);
+			}
+			else {
+				players[activePlayer].nextY = players[activePlayer].curY;
+			}
 		}
 
 		if (Keyboard.isKeyDown(Input.KEY_DOWN)) {
-			sprite = down;
-			playerIdle = false;
-
-			nextX = x + centerOfSprite;
-			nextY = (y+centerOfSprite) + delta * collisionPaddingDistance;
-			if (!mapFactory.isBlocked(nextX, nextY) && !entityCollision(nextX, nextY, enemies)){// && entityCollision(x, y, enemies) == false) {
-				sprite.update(delta);
-				if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
-					y += delta * runSpeed;
-				else 
-					y += delta * walkSpeed;
+			players[activePlayer].attemptPlayerDown(delta);
+			
+			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
+				players[activePlayer].sprite.update(delta);
 			}
 			else {
-				y--;
+				players[activePlayer].nextY = players[activePlayer].curY;
 			}
-			
-			faceingX = 0;
-			faceingY = 1;
 		}
 
 		if (Keyboard.isKeyDown(Input.KEY_LEFT)) {
-			sprite = left;
-			playerIdle = false;
-
-			nextX = (x+centerOfSprite) - delta * collisionPaddingDistance;
-			nextY = y + centerOfSprite;
-			if (!mapFactory.isBlocked(nextX, nextY) && !entityCollision(nextX, nextY, enemies)){// && entityCollision(x, y, enemies) == false) {
-				sprite.update(delta);
-				if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
-					x -= delta * runSpeed;
-				else
-					x -= delta * walkSpeed;
+			players[activePlayer].attemptPlayerLeft(delta);
+			
+			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
+				players[activePlayer].sprite.update(delta);
 			}
 			else {
-				x++;
+				players[activePlayer].nextX = players[activePlayer].curX;
 			}
-			
-			faceingX = -1;
-			faceingY = 0;
 		}
 
 		if (Keyboard.isKeyDown(Input.KEY_RIGHT)) {
-			sprite = right;
-			playerIdle = false;
-
-			nextX = (x+centerOfSprite) + delta * collisionPaddingDistance;
-			nextY = y + centerOfSprite;
-			if (!mapFactory.isBlocked(nextX, nextY) && !entityCollision(nextX, nextY, enemies)){// && entityCollision(x, y, enemies) == false) {
-				sprite.update(delta);
-				if (Keyboard.isKeyDown(Input.KEY_LSHIFT))
-					x += delta * runSpeed;
-				else
-					x += delta * walkSpeed;
+			players[activePlayer].attemptPlayerRight(delta);
+			
+			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
+				players[activePlayer].sprite.update(delta);
 			}
 			else {
-				x--;
+				players[activePlayer].nextX = players[activePlayer].curX;
 			}
-			
-			faceingX = 1;
-			faceingY = 0;
 		}
-		
-		
-		// Move bounding box with player.
-		rec.setX(x);
-		rec.setY(y);
-		// TESTING SHIT
-		entityCollision(x, y, enemies);
 
 		// Fire!
-		if (Keyboard.isKeyDown(Input.KEY_SPACE) && reloading == false) {
+		if (Keyboard.isKeyDown(Input.KEY_SPACE) && players[activePlayer].reloading == false) {
 			if (bulletFactory.curBulletFireTimer >= bulletFactory.bulletFireRate) {
-				bulletFactory.createBullet(sprite,(int)x+centerOfSprite, (int)y+centerOfSprite, (int) faceingX, (int) faceingY);
+				bulletFactory.createBullet(players[activePlayer].sprite,(int)players[activePlayer].curX + players[activePlayer].centerOfSprite, (int)players[activePlayer].curY + players[activePlayer].centerOfSprite, (int) players[activePlayer].faceingX, (int) players[activePlayer].faceingY);
 			}
 		}
 
 		// Reload!
-		if (Keyboard.isKeyDown(Input.KEY_R) && reloading == false) {
+		if (Keyboard.isKeyDown(Input.KEY_R) && players[activePlayer].reloading == false) {
 			// Reload Sounds
-			System.out.println("Reloading!");
-			reloading = true;
+			System.out.println("Unit "+activePlayer+" Reloading!");
+			players[activePlayer].reloading = true;
 		}
-		if (reloading == true) {
+		if (players[activePlayer].reloading == true) {
 			bulletFactory.increaseCurReloadTime();
 			System.out.println("Reloading Time = " + bulletFactory.getCurReloadTime());
 
 			if (bulletFactory.getCurReloadTime() >= bulletFactory.getReloadSpeed()) {
 				bulletFactory.resetCurOnField();
 				bulletFactory.resetCurReloadTime();
-				reloading = false;
+				players[activePlayer].reloading = false;
 			}
 		}
 		
 		// else display idle animation and rotate animation to facing
-		if (playerIdle) {
-			if (sprite != idleL || sprite != idleR || sprite != idleU || sprite != idleD) {
-				if (faceingX == 1) {
+		if (players[activePlayer].canIdle) {
+			players[activePlayer].sprite.restart();
+			if (players[activePlayer].sprite != players[activePlayer].idleL || players[activePlayer].sprite != players[activePlayer].idleR || players[activePlayer].sprite != players[activePlayer].idleU || players[activePlayer].sprite != players[activePlayer].idleD) {
+				if (players[activePlayer].faceingX == 1) {
 					//System.out.println("setting idle RIght");
-					sprite = idleR;
+					players[activePlayer].sprite = players[activePlayer].idleR;
 				}
-				if (faceingX == -1) {
+				if (players[activePlayer].faceingX == -1) {
 					//System.out.println("setting idle Left");
-					sprite = idleL;
+					players[activePlayer].sprite = players[activePlayer].idleL;
 				}
-				if (faceingY == -1) {
+				if (players[activePlayer].faceingY == -1) {
 					//System.out.println("setting idle Up");
-					sprite = idleU;
+					players[activePlayer].sprite = players[activePlayer].idleU;
 				}
-				if (faceingY == 1) {
+				if (players[activePlayer].faceingY == 1) {
 					//System.out.println("setting idle Down");
-					sprite = idleD;
+					players[activePlayer].sprite = players[activePlayer].idleD;
 				}
 			}
 			//sprite.restart(); not restarting animation? - check later
-			sprite.update(delta);
+			players[activePlayer].sprite.update(delta);
 		}
 		
 		// player finished doing things
-		playerIdle = true;
-
-
-
+		players[activePlayer].canIdle = true;
+		
+		// TODO loop through playerParty, if not active && ai active, unit do ai stuff
+		for (int i = 0; i < players.length; i++) {
+			if (i != activePlayer && players[i].ai) {
+				System.out.println("AI Controlling Unit = "+ (i+1));
+				
+				if (players[i].aiFollow) {
+					if (players[i].curY < (players[activePlayer].curY + aiFollowDist) || players[i].curY < (players[activePlayer].curY - aiFollowDist)) {
+						players[i].attemptPlayerDown(delta);
+						
+						if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
+							players[i].sprite.update(delta);
+						}
+						else {
+							players[i].nextX = players[i].curX;
+						}
+					}
+					
+					if (players[i].curY > (players[activePlayer].curY + aiFollowDist) || players[i].curY > (players[activePlayer].curY - aiFollowDist)) {
+						players[i].attemptPlayerUp(delta);
+						
+						if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
+							players[i].sprite.update(delta);
+						}
+						else {
+							players[i].nextX = players[i].curX;
+						}
+					}
+					
+					if (players[i].curX < (players[activePlayer].curX + aiFollowDist) || players[i].curX < (players[activePlayer].curX - aiFollowDist)) {
+						players[i].attemptPlayerRight(delta);
+						
+						if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
+							players[i].sprite.update(delta);
+						}
+						else {
+							players[i].nextX = players[i].curX;
+						}
+					}
+					
+					if (players[i].curX > (players[activePlayer].curX + aiFollowDist) || players[i].curX > (players[activePlayer].curX - aiFollowDist)) {
+						players[i].attemptPlayerLeft(delta);
+						
+						if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
+							players[i].sprite.update(delta);
+						}
+						else {
+							players[i].nextX = players[i].curX;
+						}
+					}
+					
+					/*// Set position to new Position
+					players[i].curX = players[i].nextX;
+					players[i].curY = players[i].nextY;
+					
+					// Move bounding box with player.
+					players[i].rec.setX(players[i].curX);
+					players[i].rec.setY(players[i].curY);
+					// move sight with entity
+					players[i].sightRadius.setCenterX(players[i].curX + players[i].centerOfSprite);
+					players[i].sightRadius.setCenterY(players[i].curY + players[i].centerOfSprite);*/
+				}
+			}
+		}
 
 		bulletFactory.updateBullets(mapFactory, enemies);
 
@@ -318,6 +337,36 @@ public class Main extends BasicGame {
 		for (int i = 0; i < maxEnemies; i++) {
 			enemies[i].update(delta, mapFactory);
 		}
+		
+		
+		//TODO MY GOD THIS COLLISION IS NOT AS FUN OR EASY AS ONE THINKS!
+		// FINALY CHECK COLLISIONS
+		// Detect Collisions
+		for (int p = 0; p < players.length; p++) {
+			for(int i = 0; i < enemies.length; i++) {
+				if (collisionSys.detectCollision(players[p], enemies[i])) {
+					collisionSys.handleCollisions(players[p], enemies[i]);
+				}
+			}
+		}
+		
+		
+		// Set position to new Position for All Player Units
+		for(int i = 0; i < players.length; i++) {
+			players[i].curX = players[i].nextX;
+			players[i].curY = players[i].nextY;
+			
+			// Move bounding box with player units.
+			players[i].rec.setX(players[i].curX);
+			players[i].rec.setY(players[i].curY);
+			// move sight radius with player units
+			players[i].sightRadius.setCenterX(players[i].curX + players[i].centerOfSprite);
+			players[i].sightRadius.setCenterY(players[i].curY + players[i].centerOfSprite);
+		}
+		
+		
+		// check if things are insight
+		collisionSys.detectVision(players, enemies);
 		
 		// UPDATE HUD DETAILS
 		hud.update();
@@ -329,15 +378,23 @@ public class Main extends BasicGame {
 		// Display Map
 		mapFactory.getCurMap().render(0, 0);
 		// Draw player
-		sprite.draw((int)x, (int)y);
 		// Draw bullets.
-		bulletFactory.renderBullets();
+		bulletFactory.renderBullets(g, debug);
 
+		// temp player party render
+		for (int i = 0; i < playerPartySize; i++) {
+			players[i].render(g, debug);
+		}
+		
 		// temp enemy.draw
 		//enemy.render();
 		for (int i = 0; i < maxEnemies; i++) {
-			enemies[i].render();
+			if(enemies[i].visible) {
+				enemies[i].render(g, debug);
+			}
 		}
+		
+		
 		
 		// RENDER HUD DETAILS
 		hud.render();
@@ -350,20 +407,4 @@ public class Main extends BasicGame {
 		return num;
 	}
 	
-	// super bang collision dang!
-	public boolean entityCollision(float x, float y, Entity enemies[]) {
-		boolean collision = false;
-		// NOTE; if intersected push that shit outa the way
-		for (int i = 0; i < enemies.length; i++) { 
-			if(rec.intersects(enemies[i].rec) && !enemies[i].dead) {
-				
-				System.out.println("Possible Collision? w/ Enemy " +i);
-				collision = true;
-			}
-				
-		}
-		return collision;
-	}
-
-
 }
