@@ -1,21 +1,17 @@
 package com.au.Stark.Dotz.main;
 
 import org.lwjgl.input.Keyboard;
-import org.newdawn.slick.Animation;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
-import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Circle;
-import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.geom.Shape;
 
 public class Main extends BasicGame {
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 19;
+	// latest stuff added!
+	//added godMode, added Respawning enemies, toggle-able debug mode
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 20;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 // slick, lwjgl, nifty-1.3.3, nifty-lwjgl-renderer-1.3.3, lwjgl_util, xpp3-1.1.3.4.c;
@@ -26,8 +22,12 @@ public class Main extends BasicGame {
 	static String title = "Defence of the Zombopolypse "+version;
 	static int fpslimit = 60;
 	
+	// temp using godMode for see all, probably use it as a cheat for things during debugging.
+	// use = to toggle
+	static boolean godMode = false;
+	// use - to toggle
 	static boolean debug = true;
-	static boolean showFPS = true;
+	//static boolean showFPS = true;
 
 	// Create mapFactory
 	MapFactory mapFactory = new MapFactory();
@@ -78,9 +78,11 @@ public class Main extends BasicGame {
 		app.setDisplayMode(WIDTH, HEIGHT, fullscreen);
 		app.setSmoothDeltas(true);
 		app.setTargetFrameRate(fpslimit);
-		if (debug) {
-			app.setShowFPS(showFPS);
-		}
+		//app.setShowFPS(showFPS);
+		if (debug)
+			app.setShowFPS(true);
+		else
+			app.setShowFPS(false);
 		app.start();
 	}
 
@@ -135,7 +137,28 @@ public class Main extends BasicGame {
 		if (Keyboard.isKeyDown(Keyboard.KEY_LBRACKET))
 			mapFactory.loadPrevStage();
 
-		// TODO - bullshit Collision start		
+		// debug mode Use - to view collision boxes and shizzle
+		if (Keyboard.isKeyDown(Keyboard.KEY_MINUS)) {
+			if (debug == true) {
+				debug = false;
+				System.out.println("DEBUG Mode Activated!");
+			}
+			else {
+				debug = true;
+				System.out.println("DEBUG Mode De-Activated!");
+			}
+		}
+		// GODMODE TOGGLE, See Everything! BE Invulnerable! MOVE THROUGH WALLS! Use =
+		if (Keyboard.isKeyDown(Keyboard.KEY_EQUALS)) {
+			if (godMode == true) {
+				godMode = false;
+				System.out.println("God Mode Activated!");
+			}
+			else {
+				godMode = true;
+				System.out.println("God Mode De-Activated!");
+			}
+		}
 		// Move/Check Player
 		//float nextX = 0;
 		//float nextY = 0;
@@ -176,6 +199,9 @@ public class Main extends BasicGame {
 			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
 				players[activePlayer].sprite.update(delta);
 			}
+			else if (godMode){
+				players[activePlayer].sprite.update(delta);
+			}
 			else {
 				players[activePlayer].nextY = players[activePlayer].curY;
 			}
@@ -185,6 +211,9 @@ public class Main extends BasicGame {
 			players[activePlayer].attemptPlayerDown(delta);
 			
 			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
+				players[activePlayer].sprite.update(delta);
+			}
+			else if (godMode){
 				players[activePlayer].sprite.update(delta);
 			}
 			else {
@@ -198,6 +227,9 @@ public class Main extends BasicGame {
 			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
 				players[activePlayer].sprite.update(delta);
 			}
+			else if (godMode){
+				players[activePlayer].sprite.update(delta);
+			}
 			else {
 				players[activePlayer].nextX = players[activePlayer].curX;
 			}
@@ -207,6 +239,9 @@ public class Main extends BasicGame {
 			players[activePlayer].attemptPlayerRight(delta);
 			
 			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
+				players[activePlayer].sprite.update(delta);
+			}
+			else if (godMode){
 				players[activePlayer].sprite.update(delta);
 			}
 			else {
@@ -335,7 +370,7 @@ public class Main extends BasicGame {
 		// temp enemy update
 		//enemy.update(delta, mapFactory);
 		for (int i = 0; i < maxEnemies; i++) {
-			enemies[i].update(delta, mapFactory);
+			enemies[i].update(delta, mapFactory, players);
 		}
 		
 		
@@ -367,6 +402,7 @@ public class Main extends BasicGame {
 		
 		// check if things are insight
 		collisionSys.detectVision(players, enemies);
+		// TODO make enemies chase player if they can see him
 		
 		// UPDATE HUD DETAILS
 		hud.update();
@@ -379,6 +415,7 @@ public class Main extends BasicGame {
 		mapFactory.getCurMap().render(0, 0);
 		// Draw player
 		// Draw bullets.
+		// loop if bullets visible draw
 		bulletFactory.renderBullets(g, debug);
 
 		// temp player party render
@@ -390,6 +427,9 @@ public class Main extends BasicGame {
 		//enemy.render();
 		for (int i = 0; i < maxEnemies; i++) {
 			if(enemies[i].visible) {
+				enemies[i].render(g, debug);
+			}
+			else if (godMode) {
 				enemies[i].render(g, debug);
 			}
 		}

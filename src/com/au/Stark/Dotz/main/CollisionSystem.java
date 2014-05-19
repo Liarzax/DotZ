@@ -35,7 +35,7 @@ public class CollisionSystem {
 		
 		for (int p = 0; p < players.length; p++) {
 			for (int i = 0; i < enemies.length; i++) {
-				if(players[p].sightRadius.intersects(enemies[i].rec) && !enemies[i].dead) {
+				if(players[p].sightRadius.intersects(enemies[i].rec)) {
 					//System.out.println("Player "+ (players[p].entID+1) +" can See Enemy "+ (enemies[i].entID+1) +"!!!");
 					enemies[i].visible = true;
 				}
@@ -53,13 +53,13 @@ public class CollisionSystem {
 		
 		//float xOverlap = Math.abs((curEntity.nextX - curEntity.centerOfSprite) - (othEntity.nextX - othEntity.centerOfSprite));
 		//float yOverlap = Math.abs((curEntity.nextY - curEntity.centerOfSprite) - (othEntity.nextY - othEntity.centerOfSprite));
-		float xOverlap = Math.abs((curEntity.nextX) - (othEntity.nextX));
-		float yOverlap = Math.abs((curEntity.nextY) - (othEntity.nextY));
+		//float xOverlap = Math.abs((curEntity.nextX) - (othEntity.nextX));
+		//float yOverlap = Math.abs((curEntity.nextY) - (othEntity.nextY));
 		
-		System.out.println("othEntity.nextX "+ othEntity.nextX);
+		/*System.out.println("othEntity.nextX "+ othEntity.nextX);
 		System.out.println("curEntity.nextX "+ curEntity.nextX);
 		System.out.println("xOverlap "+ xOverlap);
-		System.out.println("yOverlap "+ yOverlap);
+		System.out.println("yOverlap "+ yOverlap);*/
 		
 		
 		

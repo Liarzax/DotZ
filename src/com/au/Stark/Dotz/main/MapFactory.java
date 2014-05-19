@@ -1,7 +1,6 @@
 package com.au.Stark.Dotz.main;
 
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.tiled.TiledMap;
 
 public class MapFactory {

@@ -1,15 +1,12 @@
 package com.au.Stark.Dotz.main;
 
-import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.geom.Shape;
 
 public class Entity {
 
@@ -26,7 +23,7 @@ public class Entity {
 	int centerOfSprite = 16;
 	// Temp Bounding Box Info for Testing
 	Rectangle rec = new Rectangle(curX, curY, spriteSize, spriteSize);
-	boolean dead = false, visible = true, ai = false, aiFollow = false;
+	boolean dead = false, visible = true, ai = false, aiFollow = false, canRespawn = false;
 	
 	/*float runSpeed = 0.8f;
 	// Base walk speed 0.05f?
@@ -194,9 +191,12 @@ public class Entity {
 		//spriteDamage.stopAt(8);
 		spriteDamage.setCurrentFrame(7);
 		//spriteDamage.stopAt(7);
+		
+		// set alive bool to true
+		dead = false;
 	}
 
-	void update(int delta, MapFactory mapFactory) {
+	void update(int delta, MapFactory mapFactory, Entity players[]) {
 		// TODO: add a thingy where it checks if at dest, create new dest, else move tawords dest.
 		// TODO add another 4 vars that check what he is doing and bool, busy, so if busy, keep doing
 		// what his doinmg, else change to another pass on what his doing? makes sence in my head
@@ -293,6 +293,56 @@ public class Entity {
 		spriteDamage.setLooping(false);
 		if(dead) {
 			sprite.setLooping(false);
+			if (sprite.isStopped()) {
+				canRespawn = true;
+			}
+		}
+		if (canRespawn) {
+			// attempt to create new entity in this dead ones place
+			try {
+				// add some random numbers in here for respawning.
+				int tempX = 0;
+				int tempY = 0;
+				
+				// TODO make this better, its passable but a bit spastic.
+				// generate random x, y
+				// loop untill outsid eplayer vision
+				// check if x, y is blocked by map
+				// if not spawn unit there
+				boolean inSite = true;
+				//int pass = 0;
+				while(inSite) {
+					//tempX = (int) ((Math.random() * ((mapWidth) - (10))) + (10)); 
+					//tempY = (int) ((Math.random() * ((mapHeight) - (10))) + (10)); 
+					tempX = (int) ((Math.random() * ((mapWidth-220) - (10))) + (10)); 
+					tempY = (int) ((Math.random() * ((mapHeight-160) - (10))) + (10)); 
+					
+					//this.idleWonder();
+					// check for collision with map first
+					if (!mapFactory.isBlocked(tempX, tempY)) {
+						this.rec.setCenterX((float)tempX);
+						this.rec.setCenterX((float)tempY);
+						
+						for (int i = 0; i < players.length; i++) {
+							if(this.rec.intersects(players[i].sightRadius)) { 
+								inSite = true;
+							}
+							else {
+								inSite = false;
+							}
+						}
+					}
+				}
+				
+				//this.initEntity(tempX, tempY);
+				this.initEntity((int)tempX, (int)tempY);
+				health = 3;
+				canRespawn = false;
+			} catch (SlickException e) {
+				// TODO Auto-generated catch block
+				// i exploded for some reason!
+				e.printStackTrace();
+			}
 		}
 
 		// TODO: Seems ok, but needs work!
@@ -343,6 +393,9 @@ public class Entity {
 		
 		// Render Sight Cone? -^ could change that to a cone instead of full 360* vision, lol.
 		
+		// render next dest
+		//g.setColor(Color.red);
+		//g.drawLine(curX+centerOfSprite, curY+centerOfSprite, destX+centerOfSprite, destY+centerOfSprite);
 		
 		
 	}

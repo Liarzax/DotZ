@@ -13,7 +13,7 @@ public class BulletFactory {
 
 	// Pew Pew Details
 	int bulletSpeed = 6;
-	private Animation pewLR, pewUD, pew;
+	private Animation pew;
 
 	// firing speed controller. Possible to use game timer? or timer class?
 	int curBulletFireTimer = 0;
