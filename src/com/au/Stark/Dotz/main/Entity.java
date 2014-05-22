@@ -53,8 +53,8 @@ public class Entity {
 	boolean needGoUp = false, needGoLeft = false, needGoDown = false, needGoRight = false, canIdle = false;
 
 	// temp for collision
-	//private 
-	float collisionPaddingDistance = 0.95f;
+	// this should be renamed to something like mapCollisionPadding
+	float collisionPaddingDistance = 0.35f;
 	int entID = 0;
 	public boolean reloading = false;
 

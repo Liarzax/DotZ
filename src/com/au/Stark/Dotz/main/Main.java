@@ -10,11 +10,13 @@ import org.newdawn.slick.SlickException;
 
 public class Main extends BasicGame {
 	// latest stuff added!
-	//added godMode, added Respawning enemies, toggle-able debug mode
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 20;
+	//added SSSSSTTTTTTUUUUUUFFFFFF!!!!!!!!!!!!!!! 
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 21;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 // slick, lwjgl, nifty-1.3.3, nifty-lwjgl-renderer-1.3.3, lwjgl_util, xpp3-1.1.3.4.c;
+	//static int WIDTH = 800;
+	//static int HEIGHT = 640;
 	static int WIDTH = 800;
 	static int HEIGHT = 640;
 
@@ -27,7 +29,7 @@ public class Main extends BasicGame {
 	static boolean godMode = false;
 	// use - to toggle
 	static boolean debug = true;
-	//static boolean showFPS = true;
+	static boolean showFPS = true;
 
 	// Create mapFactory
 	MapFactory mapFactory = new MapFactory();
@@ -78,11 +80,11 @@ public class Main extends BasicGame {
 		app.setDisplayMode(WIDTH, HEIGHT, fullscreen);
 		app.setSmoothDeltas(true);
 		app.setTargetFrameRate(fpslimit);
-		//app.setShowFPS(showFPS);
-		if (debug)
+		app.setShowFPS(showFPS);
+		/*if (debug)
 			app.setShowFPS(true);
 		else
-			app.setShowFPS(false);
+			app.setShowFPS(false);*/
 		app.start();
 	}
 
@@ -139,23 +141,23 @@ public class Main extends BasicGame {
 
 		// debug mode Use - to view collision boxes and shizzle
 		if (Keyboard.isKeyDown(Keyboard.KEY_MINUS)) {
-			if (debug == true) {
-				debug = false;
+			if (debug == false) {
+				debug = true;
 				System.out.println("DEBUG Mode Activated!");
 			}
 			else {
-				debug = true;
+				debug = false;
 				System.out.println("DEBUG Mode De-Activated!");
 			}
 		}
 		// GODMODE TOGGLE, See Everything! BE Invulnerable! MOVE THROUGH WALLS! Use =
 		if (Keyboard.isKeyDown(Keyboard.KEY_EQUALS)) {
-			if (godMode == true) {
-				godMode = false;
+			if (godMode == false) {
+				godMode = true;
 				System.out.println("God Mode Activated!");
 			}
 			else {
-				godMode = true;
+				godMode = false;
 				System.out.println("God Mode De-Activated!");
 			}
 		}
@@ -171,23 +173,23 @@ public class Main extends BasicGame {
 			activePlayer = 2;
 		//activate ai for current unit - later do shit like, follow on/off, auto fire on/off, etc...
 		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-			if (players[activePlayer].ai == true) {
-				players[activePlayer].ai = false;
+			if (players[activePlayer].ai == false) {
+				players[activePlayer].ai = true;
 				System.out.println("AI for Unit "+ (activePlayer+1) +" Activated!");
 			}
 			else {
-				players[activePlayer].ai = true;
+				players[activePlayer].ai = false;
 				System.out.println("AI for Unit "+ (activePlayer+1) +" De-Activated!");
 			}
 		}
 		//activate ai follow mode
 		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
-			if (players[activePlayer].aiFollow == true) {
-				players[activePlayer].aiFollow = false;
+			if (players[activePlayer].aiFollow == false) {
+				players[activePlayer].aiFollow = true;
 				System.out.println("AI Following for Unit "+ (activePlayer+1) +" Activated!");
 			}
 			else {
-				players[activePlayer].aiFollow = true;
+				players[activePlayer].aiFollow = false;
 				System.out.println("AI Followingfor Unit "+ (activePlayer+1) +" De-Activated!");
 			}
 		}
@@ -431,6 +433,14 @@ public class Main extends BasicGame {
 			}
 			else if (godMode) {
 				enemies[i].render(g, debug);
+			}
+		}
+		
+		// DRAW the Node Map
+		// TODO THE FUCK CANT THE COLOUR BE SET!!!!!
+		for (int i = 0; i < mapFactory.nodeMap.length; i++) {
+			for (int j = 0; j < mapFactory.nodeMap.length; j++) {
+				mapFactory.nodeMap[i][j].renderNode(g, debug);
 			}
 		}
 		

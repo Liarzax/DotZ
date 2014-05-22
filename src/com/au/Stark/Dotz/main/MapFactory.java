@@ -11,6 +11,9 @@ public class MapFactory {
 	private boolean[][] blocked;
 	private static final int TILESIZE = 16;  // tile size (orig Map 32).
 	
+	// temp for debbugging.
+	public MapNode[][] nodeMap;
+	
 	// tile ID
 
 	// the level we are on/map we are using - could end up putting this into a stage class or something?
@@ -38,19 +41,45 @@ public class MapFactory {
 			// could not find the map brooo!!! BBOOOOMMMMM!!!!!
 		}
 
-		// Build Map Collision Array  based on tile properties in the TileD map 
+		
+		
+		// Build MapCollision Array  based on tile properties in the TileD map 
 		blocked = new boolean[getCurMap().getWidth()][getCurMap().getHeight()];
+		// Create an Array of MapNodes for the nodeMap
+		nodeMap = new MapNode[getCurMap().getWidth()][getCurMap().getHeight()];
+		// Assign tempX/Y Values for the starting positions (These should be half the tile size)
+		int tempX = (TILESIZE/2), tempY = (TILESIZE/2);
+		// Loop through the map and begin filling our arrays.
 		for (int xAxis=0;xAxis<getCurMap().getWidth(); xAxis++) {
-
+			// Set the initial position for the yAxis
+			tempY = (TILESIZE/2);
+			
+			// Loop through the yAxis
 			for (int yAxis=0;yAxis<getCurMap().getHeight(); yAxis++) {
+				// Assign a tile ID based on the x/yAxis CoOrds of the Map
 				int tileID = getCurMap().getTileId(xAxis, yAxis, 0);
+				// set the value of blocked as false if tileID matches
 				String value = getCurMap().getTileProperty(tileID, "blocked", "false");
-
+				
+				// Create a new mapNode & initialize it at this location using tempX/Y
+				nodeMap[xAxis][yAxis] = new MapNode();
+				nodeMap[xAxis][yAxis].initMapNode(tempX, tempY, tileID);
+				
+				// if the value of blocked matches true, change from false to true
 				if ("true".equals(value)) {
 					blocked[xAxis][yAxis] = true;
-				}
+					nodeMap[xAxis][yAxis].setBlocked(true);
+				}				
+				
+				// Increment the y Axis
+				tempY += (TILESIZE);
 			}
+			
+			// Increment the x Axis
+			tempX += (TILESIZE);
 		}
+		
+		
 	}
 
 	// TODO Load Stages stuff!! LAH LAH LAH - for Debug [ = prev / ] = next
@@ -86,21 +115,6 @@ public class MapFactory {
 		int yBlock = (int)y / getTileSize();
 		return blocked[xBlock][yBlock];
 	}
-	
-	/*
-	public boolean entityCollision(Rectangle rec, float x, float y, Entity enemies[]) {
-		boolean collision = false;
-		
-		for (int i = 0; i < enemies.length; i++) {
-			if(rec.getX() > enemies[i].rec.getX() && rec.getX() < (enemies[i].rec.getX() + enemies[i].rec.getWidth())) {
-				if(rec.getY() > enemies[i].rec.getY() && rec.getY() < (enemies[i].rec.getY() + enemies[i].rec.getHeight())) {
-					System.out.println("Possible COllision? w/ Enemy " +i);
-					collision = true;
-				}
-			}
-		}
-		return collision;
-	}*/
 
 	public TiledMap getCurMap() {
 		return currentMap;
