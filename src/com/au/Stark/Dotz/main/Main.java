@@ -11,7 +11,7 @@ import org.newdawn.slick.SlickException;
 public class Main extends BasicGame {
 	// latest stuff added!
 	//added SSSSSTTTTTTUUUUUUFFFFFF!!!!!!!!!!!!!!! 
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 21;
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 22;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 // slick, lwjgl, nifty-1.3.3, nifty-lwjgl-renderer-1.3.3, lwjgl_util, xpp3-1.1.3.4.c;
@@ -28,7 +28,7 @@ public class Main extends BasicGame {
 	// use = to toggle
 	static boolean godMode = false;
 	// use - to toggle
-	static boolean debug = true;
+	static boolean debug = false;
 	static boolean showFPS = true;
 
 	// Create mapFactory
@@ -60,6 +60,10 @@ public class Main extends BasicGame {
 
 	// collision system
 	CollisionSystem collisionSys = new CollisionSystem();
+	
+	// controll handler.
+	//ControlHandler input = new ControlHandler();
+	//private boolean downDebug, downGodMode, downAI, downAIFollow = false;
 	
 	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
 	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
@@ -111,6 +115,8 @@ public class Main extends BasicGame {
 			enemies[i].initEntity(eStartX, eStartY);
 			enemies[i].entID = i;
 			System.out.println("ent " + (i+1) + " Created!");
+			
+			enemies[i].tempSetPlayerFollowDist(0f);
 		}
 		
 		//temp party init
@@ -124,23 +130,31 @@ public class Main extends BasicGame {
 			System.out.println("player " + (i+1) + " Created!");
 			
 			players[i].tempSetPlayerSight(150f);
+			players[i].tempSetPlayerFollowDist(40f);
 		}
+		
+		// initialise input.
+		//input.init(gc);
 		
 	}
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
+		Input input = gc.getInput();
 		//Temp Quick DEBUG STUFF	       
-		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
+		if (input.isKeyPressed(Keyboard.KEY_ESCAPE))
 			gc.exit();
+		
+		//input.update(gc);
+		
 		// need to slow this down cuz i think when i try and load a map it will explode and try a million times! LOL!
-		if (Keyboard.isKeyDown(Keyboard.KEY_RBRACKET))
+		if (input.isKeyPressed(Keyboard.KEY_RBRACKET))
 			mapFactory.loadNextStage();
-		if (Keyboard.isKeyDown(Keyboard.KEY_LBRACKET))
+		if (input.isKeyPressed(Keyboard.KEY_LBRACKET))
 			mapFactory.loadPrevStage();
 
 		// debug mode Use - to view collision boxes and shizzle
-		if (Keyboard.isKeyDown(Keyboard.KEY_MINUS)) {
+		if (input.isKeyPressed(Keyboard.KEY_MINUS)) {
 			if (debug == false) {
 				debug = true;
 				System.out.println("DEBUG Mode Activated!");
@@ -150,8 +164,9 @@ public class Main extends BasicGame {
 				System.out.println("DEBUG Mode De-Activated!");
 			}
 		}
+		
 		// GODMODE TOGGLE, See Everything! BE Invulnerable! MOVE THROUGH WALLS! Use =
-		if (Keyboard.isKeyDown(Keyboard.KEY_EQUALS)) {
+		if (input.isKeyPressed(Keyboard.KEY_EQUALS)) {
 			if (godMode == false) {
 				godMode = true;
 				System.out.println("God Mode Activated!");
@@ -165,14 +180,14 @@ public class Main extends BasicGame {
 		//float nextX = 0;
 		//float nextY = 0;
 		// Set cur active char
-		if (Keyboard.isKeyDown(Keyboard.KEY_1))
+		if (input.isKeyPressed(Keyboard.KEY_1))
 			activePlayer = 0;
-		if (Keyboard.isKeyDown(Keyboard.KEY_2))
+		if (input.isKeyPressed(Keyboard.KEY_2))
 			activePlayer = 1;
-		if (Keyboard.isKeyDown(Keyboard.KEY_3))
+		if (input.isKeyPressed(Keyboard.KEY_3))
 			activePlayer = 2;
 		//activate ai for current unit - later do shit like, follow on/off, auto fire on/off, etc...
-		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+		if (input.isKeyPressed(Keyboard.KEY_A)) {
 			if (players[activePlayer].ai == false) {
 				players[activePlayer].ai = true;
 				System.out.println("AI for Unit "+ (activePlayer+1) +" Activated!");
@@ -183,7 +198,7 @@ public class Main extends BasicGame {
 			}
 		}
 		//activate ai follow mode
-		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
+		if (input.isKeyPressed(Keyboard.KEY_F)) {
 			if (players[activePlayer].aiFollow == false) {
 				players[activePlayer].aiFollow = true;
 				System.out.println("AI Following for Unit "+ (activePlayer+1) +" Activated!");
@@ -195,7 +210,7 @@ public class Main extends BasicGame {
 		}
 			
 		
-		if (Keyboard.isKeyDown(Input.KEY_UP)) {
+		if (input.isKeyDown(Input.KEY_UP)) {
 			players[activePlayer].attemptPlayerUp(delta);
 
 			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
@@ -209,7 +224,7 @@ public class Main extends BasicGame {
 			}
 		}
 
-		if (Keyboard.isKeyDown(Input.KEY_DOWN)) {
+		if (input.isKeyDown(Input.KEY_DOWN)) {
 			players[activePlayer].attemptPlayerDown(delta);
 			
 			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
@@ -223,7 +238,7 @@ public class Main extends BasicGame {
 			}
 		}
 
-		if (Keyboard.isKeyDown(Input.KEY_LEFT)) {
+		if (input.isKeyDown(Input.KEY_LEFT)) {
 			players[activePlayer].attemptPlayerLeft(delta);
 			
 			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
@@ -237,7 +252,7 @@ public class Main extends BasicGame {
 			}
 		}
 
-		if (Keyboard.isKeyDown(Input.KEY_RIGHT)) {
+		if (input.isKeyDown(Input.KEY_RIGHT)) {
 			players[activePlayer].attemptPlayerRight(delta);
 			
 			if (!mapFactory.isBlocked(players[activePlayer].nextMapX, players[activePlayer].nextMapY) ){
@@ -251,15 +266,16 @@ public class Main extends BasicGame {
 			}
 		}
 
-		// Fire!
-		if (Keyboard.isKeyDown(Input.KEY_SPACE) && players[activePlayer].reloading == false) {
+		// Fire! - kept as isKeyDown since player could have subMachine gun and hold button, maby have a way for this to alt? based on wepons?
+		// TODO maby a bool that is like, if automatic and is key down, bambambam, els if not just bam..... and have to press again tpo bam again. or something
+		if (input.isKeyDown(Input.KEY_SPACE) && players[activePlayer].reloading == false) {
 			if (bulletFactory.curBulletFireTimer >= bulletFactory.bulletFireRate) {
 				bulletFactory.createBullet(players[activePlayer].sprite,(int)players[activePlayer].curX + players[activePlayer].centerOfSprite, (int)players[activePlayer].curY + players[activePlayer].centerOfSprite, (int) players[activePlayer].faceingX, (int) players[activePlayer].faceingY);
 			}
 		}
 
 		// Reload!
-		if (Keyboard.isKeyDown(Input.KEY_R) && players[activePlayer].reloading == false) {
+		if (input.isKeyPressed(Input.KEY_R) && players[activePlayer].reloading == false) {
 			// Reload Sounds
 			System.out.println("Unit "+activePlayer+" Reloading!");
 			players[activePlayer].reloading = true;
@@ -308,62 +324,63 @@ public class Main extends BasicGame {
 			if (i != activePlayer && players[i].ai) {
 				System.out.println("AI Controlling Unit = "+ (i+1));
 				
+				// TODO maby use the needGoUp/needGoLeft/needGoDown/needGoRight System? worked for zombies right?
 				if (players[i].aiFollow) {
-					if (players[i].curY < (players[activePlayer].curY + aiFollowDist) || players[i].curY < (players[activePlayer].curY - aiFollowDist)) {
-						players[i].attemptPlayerDown(delta);
+					if(!players[i].followRadius.intersects(players[activePlayer].rec)) {
+						if (players[i].curY < (players[activePlayer].curY + aiFollowDist) || players[i].curY < (players[activePlayer].curY - aiFollowDist)) {
+							players[i].attemptPlayerDown(delta);
+							
+							if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
+								players[i].sprite.update(delta);
+							}
+							else {
+								players[i].nextX = players[i].curX;
+							}
+						}
 						
-						if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
-							players[i].sprite.update(delta);
+						if (players[i].curY > (players[activePlayer].curY + aiFollowDist) || players[i].curY > (players[activePlayer].curY - aiFollowDist)) {
+							players[i].attemptPlayerUp(delta);
+							
+							if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
+								players[i].sprite.update(delta);
+							}
+							else {
+								players[i].nextX = players[i].curX;
+							}
 						}
-						else {
-							players[i].nextX = players[i].curX;
+						
+						if (players[i].curX < (players[activePlayer].curX + aiFollowDist) || players[i].curX < (players[activePlayer].curX - aiFollowDist)) {
+							players[i].attemptPlayerRight(delta);
+							
+							if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
+								players[i].sprite.update(delta);
+							}
+							else {
+								players[i].nextX = players[i].curX;
+							}
 						}
+						
+						if (players[i].curX > (players[activePlayer].curX + aiFollowDist) || players[i].curX > (players[activePlayer].curX - aiFollowDist)) {
+							players[i].attemptPlayerLeft(delta);
+							
+							if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
+								players[i].sprite.update(delta);
+							}
+							else {
+								players[i].nextX = players[i].curX;
+							}
+						}
+						// end check if within radius
 					}
 					
-					if (players[i].curY > (players[activePlayer].curY + aiFollowDist) || players[i].curY > (players[activePlayer].curY - aiFollowDist)) {
-						players[i].attemptPlayerUp(delta);
-						
-						if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
-							players[i].sprite.update(delta);
-						}
-						else {
-							players[i].nextX = players[i].curX;
-						}
-					}
 					
-					if (players[i].curX < (players[activePlayer].curX + aiFollowDist) || players[i].curX < (players[activePlayer].curX - aiFollowDist)) {
-						players[i].attemptPlayerRight(delta);
-						
-						if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
-							players[i].sprite.update(delta);
-						}
-						else {
-							players[i].nextX = players[i].curX;
-						}
-					}
 					
-					if (players[i].curX > (players[activePlayer].curX + aiFollowDist) || players[i].curX > (players[activePlayer].curX - aiFollowDist)) {
-						players[i].attemptPlayerLeft(delta);
-						
-						if (!mapFactory.isBlocked(players[i].nextMapX, players[i].nextMapY) ){
-							players[i].sprite.update(delta);
-						}
-						else {
-							players[i].nextX = players[i].curX;
-						}
-					}
-					
-					/*// Set position to new Position
-					players[i].curX = players[i].nextX;
-					players[i].curY = players[i].nextY;
-					
-					// Move bounding box with player.
-					players[i].rec.setX(players[i].curX);
-					players[i].rec.setY(players[i].curY);
-					// move sight with entity
-					players[i].sightRadius.setCenterX(players[i].curX + players[i].centerOfSprite);
-					players[i].sightRadius.setCenterY(players[i].curY + players[i].centerOfSprite);*/
 				}
+				
+				
+				// ai not idling?
+				
+				
 			}
 		}
 
@@ -399,6 +416,10 @@ public class Main extends BasicGame {
 			// move sight radius with player units
 			players[i].sightRadius.setCenterX(players[i].curX + players[i].centerOfSprite);
 			players[i].sightRadius.setCenterY(players[i].curY + players[i].centerOfSprite);
+			// move follow radius with player units
+			players[i].followRadius.setCenterX(players[i].curX + players[i].centerOfSprite);
+			players[i].followRadius.setCenterY(players[i].curY + players[i].centerOfSprite);
+			
 		}
 		
 		

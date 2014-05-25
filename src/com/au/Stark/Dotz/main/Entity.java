@@ -39,8 +39,11 @@ public class Entity {
 	//Shape circle = new Circle(curX+15,curY+15,50);
 	// 50 is nice and close, but not enough for vision.
 	float sightRange = 50f;
-	Circle sightRadius = new Circle(curX, curY, sightRange);;
+	Circle sightRadius = new Circle(curX, curY, sightRange);
 	
+	// TODO follow radius / could have diff ranges, close, mid, far, vission range, etc...
+	float followRange = 40f;
+	Circle followRadius = new Circle(curX, curY, followRange);
 	
 	// map height & width - find a way tp fix this later
 	//int mapWidth = 640, mapHeight = 480;
@@ -73,6 +76,8 @@ public class Entity {
 		rec.setCenterY(curY + centerOfSprite);
 		sightRadius.setCenterX(curX + centerOfSprite);
 		sightRadius.setCenterY(curY + centerOfSprite);
+		followRadius.setCenterX(curX + centerOfSprite);
+		followRadius.setCenterY(curY + centerOfSprite);
 		
 		// set original spawn location
 		spawnX = locationX;
@@ -284,6 +289,10 @@ public class Entity {
 			// move sight with entity
 			sightRadius.setCenterX(curX + centerOfSprite);
 			sightRadius.setCenterY(curY + centerOfSprite);
+			// move follow radius
+			followRadius.setCenterX(curX + centerOfSprite);
+			followRadius.setCenterY(curY + centerOfSprite);
+			
 						
 		}
 
@@ -392,6 +401,10 @@ public class Entity {
 		g.draw(sightRadius);
 		
 		// Render Sight Cone? -^ could change that to a cone instead of full 360* vision, lol.
+		
+		// render follow radius.
+		g.setColor(Color.yellow);
+		g.draw(followRadius);
 		
 		// render next dest
 		//g.setColor(Color.red);
@@ -630,6 +643,10 @@ public class Entity {
 	public void tempSetPlayerSight(float sight) {
 		this.sightRange = sight;
 		sightRadius = new Circle(curX, curY, sight);
+	}
+	public void tempSetPlayerFollowDist(float followDist) {
+		this.followRange = followDist;
+		followRadius = new Circle(curX, curY, followDist);
 	}
 
 }
