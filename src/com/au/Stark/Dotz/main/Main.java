@@ -3,6 +3,7 @@ package com.au.Stark.Dotz.main;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -12,7 +13,7 @@ import org.newdawn.slick.geom.Line;
 public class Main extends BasicGame {
 	// latest stuff added!
 	//added SSSSSTTTTTTUUUUUUFFFFFF!!!!!!!!!!!!!!! 
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 23;
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 24;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 // slick, lwjgl, nifty-1.3.3, nifty-lwjgl-renderer-1.3.3, lwjgl_util, xpp3-1.1.3.4.c;
@@ -547,7 +548,10 @@ public class Main extends BasicGame {
 		// TODO THE FUCK CANT THE COLOUR BE SET!!!!!
 		for (int i = 0; i < mapFactory.nodeMap.length; i++) {
 			for (int j = 0; j < mapFactory.nodeMap.length; j++) {
-				mapFactory.nodeMap[i][j].renderNode(g, debug);
+				// TODO - looks like nodes are fixed and no longer rendering allover the map
+				if (mapFactory.nodeMap[i][j] != null) {
+					mapFactory.nodeMap[i][j].renderNode(g, debug);
+				}
 			}
 		}
 		
@@ -556,6 +560,21 @@ public class Main extends BasicGame {
 		// RENDER HUD DETAILS
 		hud.render();
 
+		// TODO make this more prettier during debuging.
+		if (debug) {
+			g.setColor(Color.white);
+			g.drawString("Player 1 HP - [|||||||]", 20, 580);
+			g.drawString("Player 2 HP - [|||||||]", 20, 600);
+			g.drawString("Player 3 HP - [|||||||]", 20, 620);
+			
+			g.drawString("Player 1 Ammo - [|||||||]", 260, 580);
+			g.drawString("Player 2 Ammo - [|||||||]", 260, 600);
+			g.drawString("Player 3 Amm0 - [|||||||]", 260, 620);
+			
+			g.drawString("Player 1 AI - AI[ ] S[ ] F[ ]", 520, 580);
+			g.drawString("Player 2 AI - AI[ ] S[ ] F[ ]", 520, 600);
+			g.drawString("Player 3 AI - AI[ ] S[ ] F[ ]", 520, 620);
+		}
 	}
 	
 	// stupid java rand generator only from 0 to num, not from num to num. FIXED!

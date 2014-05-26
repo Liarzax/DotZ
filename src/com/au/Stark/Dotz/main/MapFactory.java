@@ -62,8 +62,11 @@ public class MapFactory {
 				String value = getCurMap().getTileProperty(tileID, "blocked", "false");
 				
 				// Create a new mapNode & initialize it at this location using tempX/Y
-				nodeMap[xAxis][yAxis] = new MapNode();
-				nodeMap[xAxis][yAxis].initMapNode(tempX, tempY, tileID);
+				//TODO Fuck yeah looks like i fixed the nodes spawning erry where.
+				if (getCurMap().getTileImage(xAxis, yAxis, 0) != null) {
+					nodeMap[xAxis][yAxis] = new MapNode();
+					nodeMap[xAxis][yAxis].initMapNode(tempX, tempY, tileID);
+				}
 				
 				// if the value of blocked matches true, change from false to true
 				if ("true".equals(value)) {
