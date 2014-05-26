@@ -7,11 +7,12 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Line;
 
 public class Main extends BasicGame {
 	// latest stuff added!
 	//added SSSSSTTTTTTUUUUUUFFFFFF!!!!!!!!!!!!!!! 
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 22;
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 23;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 // slick, lwjgl, nifty-1.3.3, nifty-lwjgl-renderer-1.3.3, lwjgl_util, xpp3-1.1.3.4.c;
@@ -54,12 +55,14 @@ public class Main extends BasicGame {
 	int activePlayer = 0;
 	
 	// temp enemy
-	//Entity enemy = new Entity();
+	// 10
 	private int maxEnemies = 10;
 	Entity[] enemies = new Entity[maxEnemies];
 
 	// collision system
 	CollisionSystem collisionSys = new CollisionSystem();
+	
+	
 	
 	// controll handler.
 	//ControlHandler input = new ControlHandler();
@@ -73,7 +76,7 @@ public class Main extends BasicGame {
 	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
 	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
 	/////// ************************ STOP GOING BACK!! \\\\\\\\\\\\\\\\\\\\\\
-
+	
 
 	public Main(String title) {
 		super(title);
@@ -205,7 +208,18 @@ public class Main extends BasicGame {
 			}
 			else {
 				players[activePlayer].aiFollow = false;
-				System.out.println("AI Followingfor Unit "+ (activePlayer+1) +" De-Activated!");
+				System.out.println("AI Following for Unit "+ (activePlayer+1) +" De-Activated!");
+			}
+		}
+		//activate ai follow mode
+		if (input.isKeyPressed(Keyboard.KEY_S)) {
+			if (players[activePlayer].aiShoot == false) {
+				players[activePlayer].aiShoot = true;
+				System.out.println("AI AutoFire for Unit "+ (activePlayer+1) +" Activated!");
+			}
+			else {
+				players[activePlayer].aiShoot = false;
+				System.out.println("AI AutoFire for Unit "+ (activePlayer+1) +" De-Activated!");
 			}
 		}
 			
@@ -370,19 +384,85 @@ public class Main extends BasicGame {
 								players[i].nextX = players[i].curX;
 							}
 						}
-						// end check if within radius
+						// /inFollowRadius
+					}
+					// /aiFollowModeCheck
+				}
+				
+				/*float tempXDir1 = 0, tempXDir2 = 0;
+				float tempYDir1 = 0, tempYDir2 = 0;
+				float tempShootCone = 5;*/
+				
+				// ai fires at enemies in range/front of ai
+				if (players[i].aiShoot){
+					//bulletFactory.createBullet(players[i].sprite, (int)players[i].curX, (int)players[i].curY, players[i].faceingX, players[i].faceingY);
+					//true shoould be if enemy can be hit, likecast a ray or something.
+					//boolean rayHit = false;
+					players[i].tempXDir1 = 0;
+					players[i].tempXDir2 = 0;
+					players[i].tempYDir1 = 0;
+					players[i].tempYDir2 = 0;
+					//players[i].tempShootCone = 5;
+					
+					// x0 y-1 for up | x0 y1 for down | x-1 y0 for left | x1 y0 for right
+					if (players[i].faceingX == 1 && players[i].faceingY == 0) {
+						players[i].tempXDir1 = players[i].rec.getCenterX() + players[i].sightRange;
+						players[i].tempYDir1 = players[i].rec.getCenterY() -players[i].tempShootCone;
+						players[i].tempXDir2 = players[i].rec.getCenterX() + players[i].sightRange;
+						players[i].tempYDir2 = players[i].rec.getCenterY() +players[i].tempShootCone;
+					}
+					if (players[i].faceingX == -1 && players[i].faceingY == 0) {
+						players[i].tempXDir1 = players[i].rec.getCenterX() - players[i].sightRange;
+						players[i].tempYDir1 = players[i].rec.getCenterY() -players[i].tempShootCone;
+						players[i].tempXDir2 = players[i].rec.getCenterX() - players[i].sightRange;
+						players[i].tempYDir2 = players[i].rec.getCenterY() +players[i].tempShootCone;
+					}
+					if (players[i].faceingY == 1 && players[i].faceingX == 0) {
+						players[i].tempYDir1 = players[i].rec.getCenterY() + players[i].sightRange;
+						players[i].tempXDir1 = players[i].rec.getCenterX() -players[i].tempShootCone;
+						players[i].tempYDir2 = players[i].rec.getCenterY() + players[i].sightRange;
+						players[i].tempXDir2 = players[i].rec.getCenterX() +players[i].tempShootCone;
+					}
+					if (players[i].faceingY == -1 && players[i].faceingX == 0) {
+						players[i].tempYDir1 = players[i].rec.getCenterY() - players[i].sightRange;
+						players[i].tempXDir1 = players[i].rec.getCenterX() -players[i].tempShootCone;
+						players[i].tempYDir2 = players[i].rec.getCenterY() - players[i].sightRange;
+						players[i].tempXDir2 = players[i].rec.getCenterX() +players[i].tempShootCone;
 					}
 					
+					players[i].bulletRay1 = new Line(players[i].rec.getCenterX(), players[i].rec.getCenterY(), players[i].tempXDir1, players[i].tempYDir1);
+					players[i].bulletRay2 = new Line(players[i].rec.getCenterX(), players[i].rec.getCenterY(), players[i].tempXDir2, players[i].tempYDir2);
 					
+					for (int e = 0; e < enemies.length; e++) {
+						if (players[i].bulletRay1.intersects(enemies[e].rec) || players[i].bulletRay2.intersects(enemies[e].rec)) {
+							players[i].bulletRayHit = true;
+						}
+					}
+					
+					if (players[i].bulletRayHit && players[i].reloading == false) {
+						if (bulletFactory.curBulletFireTimer >= bulletFactory.bulletFireRate) {
+							bulletFactory.createBullet(players[i].sprite,(int)players[i].curX + players[i].centerOfSprite, (int)players[i].curY + players[i].centerOfSprite, (int) players[i].faceingX, (int) players[i].faceingY);
+						}
+						players[i].bulletRayHit = false;
+					}
+					
+					// if reloading == false, and clip empty -> if has clip -> reload.
 					
 				}
 				
 				
-				// ai not idling?
-				
+				// NEW ACTIONS HERE.
 				
 			}
+			// /endCheckAIActive
+			else {
+				// clear the ai range bullets red cone thingy temp bugfix. clear cuz pc takes over
+				players[activePlayer].bulletRay1.set(0,0,0,0);
+				players[activePlayer].bulletRay2.set(0,0,0,0);
+			}
 		}
+		// /endAIForLoops
+		
 
 		bulletFactory.updateBullets(mapFactory, enemies);
 
@@ -399,7 +479,7 @@ public class Main extends BasicGame {
 		for (int p = 0; p < players.length; p++) {
 			for(int i = 0; i < enemies.length; i++) {
 				if (collisionSys.detectCollision(players[p], enemies[i])) {
-					collisionSys.handleCollisions(players[p], enemies[i]);
+					//collisionSys.handleCollisions(players[p], enemies[i]);
 				}
 			}
 		}
@@ -419,6 +499,12 @@ public class Main extends BasicGame {
 			// move follow radius with player units
 			players[i].followRadius.setCenterX(players[i].curX + players[i].centerOfSprite);
 			players[i].followRadius.setCenterY(players[i].curY + players[i].centerOfSprite);
+			// move the shootingCone / not required.
+			//players[i].bulletRay1.set(players[i].rec.getCenterX(), players[i].rec.getCenterY(), players[i].tempXDir1, players[i].tempYDir1);
+			//players[i].bulletRay2.set(players[i].rec.getCenterX(), players[i].rec.getCenterY(), players[i].tempXDir2, players[i].tempYDir2);
+			
+			
+			
 			
 		}
 		
@@ -440,7 +526,7 @@ public class Main extends BasicGame {
 		// Draw bullets.
 		// loop if bullets visible draw
 		bulletFactory.renderBullets(g, debug);
-
+		
 		// temp player party render
 		for (int i = 0; i < playerPartySize; i++) {
 			players[i].render(g, debug);

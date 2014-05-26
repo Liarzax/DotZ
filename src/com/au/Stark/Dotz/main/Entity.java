@@ -6,6 +6,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Circle;
+import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Rectangle;
 
 public class Entity {
@@ -23,7 +24,7 @@ public class Entity {
 	int centerOfSprite = 16;
 	// Temp Bounding Box Info for Testing
 	Rectangle rec = new Rectangle(curX, curY, spriteSize, spriteSize);
-	boolean dead = false, visible = true, ai = false, aiFollow = false, canRespawn = false;
+	boolean dead = false, visible = true, ai = false, aiFollow = false, aiShoot = false, canRespawn = false;
 	
 	/*float runSpeed = 0.8f;
 	// Base walk speed 0.05f?
@@ -59,7 +60,17 @@ public class Entity {
 	// this should be renamed to something like mapCollisionPadding
 	float collisionPaddingDistance = 0.35f;
 	int entID = 0;
-	public boolean reloading = false;
+	public boolean reloading = false, bulletRayHit = false;
+	
+	// temp for shooting testing
+	float tempXDir1 = 0;
+	float tempXDir2 = 0;
+	float tempYDir1 = 0;
+	float tempYDir2 = 0;
+	float tempShootCone = 5;
+	Line bulletRay1 = new Line(0,0,0,0);
+	Line bulletRay2 = new Line(0,0,0,0);
+	
 
 	public Entity() {
 
@@ -141,10 +152,11 @@ public class Entity {
 			movementIdleR[i].rotate(90f);
 		}
 		// rotate each death image in the animation
+		// deathDown[i].setCenterOfRotation(spriteSize, spriteSize); 
 		for (int i = 0; i< deathUp.length; i++) {
 			deathDown[i].rotate(180f);
 			deathLeft[i].rotate(270f);
-			deathRight[i].rotate(90f);
+			deathRight[i].rotate(90f); 
 		}
 		
 		int [] idleDur 			= {200};
@@ -405,6 +417,13 @@ public class Entity {
 		// render follow radius.
 		g.setColor(Color.yellow);
 		g.draw(followRadius);
+		
+		// render shooting test
+		//if (bulletRayHit) {
+			g.setColor(Color.red);
+			g.draw(bulletRay1);
+			g.draw(bulletRay2);
+		//}
 		
 		// render next dest
 		//g.setColor(Color.red);

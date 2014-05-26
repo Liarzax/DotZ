@@ -13,6 +13,7 @@ Deadfence of the Zombies
 '1-3'	Keys to swap between active party members.
 'A'		Key to Activate/De-Activate AI Mode on currently selected party member.
 'F'		Key to Activate/Deactivate Follow Mode on current party member, when controlled by AI.
+'S'		Key to Activate/De-Activate AutoFire for current party member, when controlled by AI.
 
 
 TODO LIST

@@ -49,28 +49,45 @@ public class CollisionSystem {
 
 	public void handleCollisions(Entity curEntity, Entity othEntity) {
 		// TODO Auto-generated method stub
-		System.out.println("Handling Collision w/ Enemy "+ (othEntity.entID+1) +" and Player "+ (curEntity.entID+1));
+		//System.out.println("Handling Collision w/ Enemy "+ (othEntity.entID+1) +" and Player "+ (curEntity.entID+1));
 		
-		//float xOverlap = Math.abs((curEntity.nextX - curEntity.centerOfSprite) - (othEntity.nextX - othEntity.centerOfSprite));
-		//float yOverlap = Math.abs((curEntity.nextY - curEntity.centerOfSprite) - (othEntity.nextY - othEntity.centerOfSprite));
-		//float xOverlap = Math.abs((curEntity.nextX) - (othEntity.nextX));
-		//float yOverlap = Math.abs((curEntity.nextY) - (othEntity.nextY));
+		float xOverlap = Math.abs((curEntity.nextX) - (othEntity.nextX));
+		float yOverlap = Math.abs((curEntity.nextY) - (othEntity.nextY));
+		xOverlap = xOverlap/16;
+		yOverlap = yOverlap/16;
 		
-		/*System.out.println("othEntity.nextX "+ othEntity.nextX);
+		System.out.println("othEntity.nextX "+ othEntity.nextX);
 		System.out.println("curEntity.nextX "+ curEntity.nextX);
 		System.out.println("xOverlap "+ xOverlap);
-		System.out.println("yOverlap "+ yOverlap);*/
+		System.out.println("yOverlap "+ yOverlap);
+		
+		if (curEntity.curX < othEntity.curX) {
+			curEntity.nextX -= xOverlap;
+			othEntity.nextX += xOverlap;
+			curEntity.curX = curEntity.nextX;
+			othEntity.curX = othEntity.nextX;
+		}
+		else {
+			curEntity.nextX += xOverlap;
+			othEntity.nextX -= xOverlap;
+			curEntity.curX = curEntity.nextX;
+			othEntity.curX = othEntity.nextX;
+		}
+		
+		if (curEntity.curY < othEntity.curY) {
+			curEntity.nextY -= yOverlap;
+			othEntity.nextY += yOverlap;
+			curEntity.curY = curEntity.nextY;
+			othEntity.curY = othEntity.nextY;
+		}
+		else {
+			curEntity.nextY += yOverlap;
+			othEntity.nextY -= yOverlap;
+			curEntity.curY = curEntity.nextY;
+			othEntity.curY = othEntity.nextY;
+		}
 		
 		
-		
-		/*curEntity.nextX = curEntity.nextX - ((curEntity.Velocity/(curEntity.Velocity + othEntity.Velocity)) * xOverlap);
-		curEntity.nextY = curEntity.nextY - ((curEntity.Velocity/(curEntity.Velocity + othEntity.Velocity)) * yOverlap);
-			
-			System.out.println("nextX "+ curEntity.nextX);
-			System.out.println("nextY "+ curEntity.nextY);
-			
-		othEntity.nextX = othEntity.nextX - ((othEntity.Velocity/(othEntity.Velocity + curEntity.Velocity)) * xOverlap);
-		othEntity.nextY = othEntity.nextY - ((othEntity.Velocity/(othEntity.Velocity + curEntity.Velocity)) * yOverlap);*/
 	}
 	
 }
