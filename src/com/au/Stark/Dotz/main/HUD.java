@@ -2,6 +2,8 @@ package com.au.Stark.Dotz.main;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 
 //import de.lessvoid.nifty.Nifty;
 
@@ -25,6 +27,9 @@ public class HUD {
 	String p1Status = "Player 1";
 	String p2Status = "Player 2";
 	String p3Status = "Player 3";
+	
+	// P1FacePanel
+	Image p1FacePlate, p2FacePlate, p3FacePlate; // = new Image("assets/P"+1+"FacePanel.png");
 
 	public HUD() {
 
@@ -32,6 +37,19 @@ public class HUD {
 
 	public void init() {
 		//nifty = new Nifty(null, null, null, null);
+		
+		// try and load faceplates - these should probably be in the enitty class,, but this will do untill i split the entity class.
+		try {
+			p1FacePlate = new Image("assets/P"+1+"FacePanel.png");
+			p2FacePlate = new Image("assets/P"+2+"FacePanel.png");
+			p3FacePlate = new Image("assets/P"+3+"FacePanel.png");
+		} catch (SlickException e) {
+			// TODO Auto-generated catch block
+			// hectic fail to load, now ima cry
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 	public void update(Entity players[]) {
@@ -268,6 +286,11 @@ public class HUD {
 		g.drawString(p1Status, 20, 580);
 		g.drawString(p2Status, 20, 600);
 		g.drawString(p3Status, 20, 620);
+		
+		// draw faceplates.
+		p1FacePlate.draw(740, 20);
+		p2FacePlate.draw(740, 60);
+		p3FacePlate.draw(740, 100);
 		
 		// TODO make this more prettier during debuging.
 		/*if (debug) {

@@ -27,6 +27,8 @@ TODO LIST
  - Make Bullet counter work once bullets and guns fixed
  - Make Player/Unit health counter work since its just static atm.
  - 
+ - make the facePlates selectable.
+ - Context Sensitive Right-Click menu.
  
  
  BUG LIST

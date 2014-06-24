@@ -13,7 +13,7 @@ import org.newdawn.slick.geom.Line;
 public class Main extends BasicGame {
 	// latest stuff added!
 	//added SSSSSTTTTTTUUUUUUFFFFFF!!!!!!!!!!!!!!! 
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 27;
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 28;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 
@@ -289,44 +289,11 @@ public class Main extends BasicGame {
 
 		// Reload/attempt to reload!
 		if (input.isKeyPressed(Input.KEY_R) && players[activePlayer].reloading == false) {
-			if (!players[activePlayer].availableClips.isEmpty()) {
-				// Reload Sounds
-				System.out.println("Unit "+activePlayer+" Reloading!");
-				players[activePlayer].reloading = true;
-				
-				// TODO - this is buggy as shit? (Or is it, looks like its working now?). 
-				// if bullets remain in current clip, add it to the back of the clips, i had a Add this method, but also did not work, hmm
-				if (players[activePlayer].currentClip.getCurBullets() > 0) {
-					//players[activePlayer].availableClips.add(players[activePlayer].currentClip);
-					
-					//TODO: there has to be a betterway to do this?
-					players[activePlayer].currentClip.maxBullets = players[activePlayer].currentClip.curBullets;
-					players[activePlayer].availableClips.add(players[activePlayer].currentClip);
-					players[activePlayer].currentClip = null;
-				}
-			}
-			else {
-				// reloading failed.
-				System.out.println("Unit "+activePlayer+" has no clips to reload with!");
-			}
-			
+			attemptToReload(players[activePlayer]);			
 		}
 		for (int i = 0; i < players.length; i++) {
 			if (players[i].reloading == true) {
-				bulletFactory.increaseCurReloadTime();
-				// Play reloading animation.
-				//System.out.println("Reloading Time = " + bulletFactory.getCurReloadTime());
-		
-				// finished reloading
-				if (bulletFactory.getCurReloadTime() >= bulletFactory.getReloadSpeed()) {
-					// reload with the next available clip.
-					players[i].currentClip = players[i].availableClips.get(0);
-					// remove the first clip in the list, used up.
-					players[i].availableClips.remove(0);
-					
-					bulletFactory.resetCurReloadTime();
-					players[i].reloading = false;
-				}
+				processReloading(players[i]);
 			}
 		}
 		
@@ -361,7 +328,7 @@ public class Main extends BasicGame {
 		// TODO loop through playerParty, if not active && ai active, unit do ai stuff
 		for (int i = 0; i < players.length; i++) {
 			if (i != activePlayer && players[i].ai) {
-				System.out.println("AI Controlling Unit = "+ (i+1));
+				//System.out.println("AI Controlling Unit = "+ (i+1));
 				
 				// TODO maby use the needGoUp/needGoLeft/needGoDown/needGoRight System? worked for zombies right?
 				if (players[i].aiFollow) {
@@ -478,6 +445,14 @@ public class Main extends BasicGame {
 					
 				}
 				
+				// ai reloads as required
+				if (players[i].currentClip.curBullets <= 0 && !players[i].reloading) {
+					attemptToReload(players[i]);
+				}
+				// if reloading, process it.
+				if (players[i].reloading) {
+					processReloading(players[i]);
+				}
 				
 				// NEW ACTIONS HERE.
 				
@@ -594,6 +569,46 @@ public class Main extends BasicGame {
 	public int randNumBetween(int min, int max) {
 		int num = (int) ((Math.random() * (max - min)) + min); 
 		return num;
+	}
+	
+	public void attemptToReload(Entity entity) {
+		if (!entity.availableClips.isEmpty()) {
+			// Reload Sounds
+			System.out.println("Unit "+(entity.entID+1)+" Reloading!");
+			entity.reloading = true;
+			
+			// TODO - this is buggy as shit? (Or is it, looks like its working now?). 
+			// if bullets remain in current clip, add it to the back of the clips, i had a Add this method, but also did not work, hmm
+			if (entity.currentClip.getCurBullets() > 0) {
+				//players[activePlayer].availableClips.add(players[activePlayer].currentClip);
+				
+				//TODO: there has to be a betterway to do this?
+				entity.currentClip.maxBullets = entity.currentClip.curBullets;
+				entity.availableClips.add(entity.currentClip);
+				entity.currentClip = null;
+			}
+		}
+		else {
+			// reloading failed.
+			System.out.println("Unit "+(entity.entID+1)+" has no clips to reload with!");
+		}
+	}
+	
+	public void processReloading(Entity entity) {
+		bulletFactory.increaseCurReloadTime();
+		// Play reloading animation.
+		//System.out.println("Reloading Time = " + bulletFactory.getCurReloadTime());
+
+		// finished reloading
+		if (bulletFactory.getCurReloadTime() >= bulletFactory.getReloadSpeed()) {
+			// reload with the next available clip.
+			entity.currentClip = entity.availableClips.get(0);
+			// remove the first clip in the list, used up.
+			entity.availableClips.remove(0);
+			
+			bulletFactory.resetCurReloadTime();
+			entity.reloading = false;
+		}
 	}
 	
 }
