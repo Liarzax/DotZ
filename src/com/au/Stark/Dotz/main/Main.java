@@ -13,7 +13,7 @@ import org.newdawn.slick.geom.Line;
 public class Main extends BasicGame {
 	// latest stuff added!
 	//added SSSSSTTTTTTUUUUUUFFFFFF!!!!!!!!!!!!!!! 
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 26;
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 27;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 
@@ -287,20 +287,43 @@ public class Main extends BasicGame {
 			}
 		}
 
-		// Reload!
+		// Reload/attempt to reload!
 		if (input.isKeyPressed(Input.KEY_R) && players[activePlayer].reloading == false) {
-			// Reload Sounds
-			System.out.println("Unit "+activePlayer+" Reloading!");
-			players[activePlayer].reloading = true;
+			if (!players[activePlayer].availableClips.isEmpty()) {
+				// Reload Sounds
+				System.out.println("Unit "+activePlayer+" Reloading!");
+				players[activePlayer].reloading = true;
+				
+				// TODO - this is buggy as shit? (Or is it, looks like its working now?). 
+				// if bullets remain in current clip, add it to the back of the clips, i had a Add this method, but also did not work, hmm
+				if (players[activePlayer].currentClip.getCurBullets() > 0) {
+					//players[activePlayer].availableClips.add(players[activePlayer].currentClip);
+					
+					//TODO: there has to be a betterway to do this?
+					players[activePlayer].currentClip.maxBullets = players[activePlayer].currentClip.curBullets;
+					players[activePlayer].availableClips.add(players[activePlayer].currentClip);
+					players[activePlayer].currentClip = null;
+				}
+			}
+			else {
+				// reloading failed.
+				System.out.println("Unit "+activePlayer+" has no clips to reload with!");
+			}
+			
 		}
 		for (int i = 0; i < players.length; i++) {
 			if (players[i].reloading == true) {
 				bulletFactory.increaseCurReloadTime();
-				System.out.println("Reloading Time = " + bulletFactory.getCurReloadTime());
+				// Play reloading animation.
+				//System.out.println("Reloading Time = " + bulletFactory.getCurReloadTime());
 		
+				// finished reloading
 				if (bulletFactory.getCurReloadTime() >= bulletFactory.getReloadSpeed()) {
-					//bulletFactory.resetCurOnField();
-					players[i].clip.curBullets = players[i].clip.maxBullets;
+					// reload with the next available clip.
+					players[i].currentClip = players[i].availableClips.get(0);
+					// remove the first clip in the list, used up.
+					players[i].availableClips.remove(0);
+					
 					bulletFactory.resetCurReloadTime();
 					players[i].reloading = false;
 				}

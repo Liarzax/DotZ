@@ -47,7 +47,7 @@ public class BulletFactory {
 	
 	public void createBullet(Entity entity) {
 		// this should eventuly be a check to see if you have bullets, fire if not, click.
-		if (entity.clip.curBullets > 0) {
+		if (entity.currentClip.curBullets > 0) {
 			// Gun Fire Sound!
 			System.out.println("Bang!");
 			Bullet bullet = new Bullet();
@@ -62,8 +62,7 @@ public class BulletFactory {
 			bullet.exists = true;
 			bullets.add(bullet);
 			
-			entity.clip.curBullets--;
-			//curBulletsOnField++;
+			entity.currentClip.curBullets--;
 		}
 		else {
 			// Empty Clip Sound!

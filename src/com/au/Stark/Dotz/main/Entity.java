@@ -54,9 +54,9 @@ public class Entity {
 	int mapWidth = 800, mapHeight = 640;
 	
 	// temp for seperate weapons handling
-	BulletClip clip = new BulletClip();
+	BulletClip currentClip = new BulletClip();
 	// multiple clips, and dif types, muah hahahaha?
-	//List<BulletClip> clips = new ArrayList<BulletClip>();
+	List<BulletClip> availableClips = new ArrayList<BulletClip>();
 	// then can iterate through and have a check, if clip type == wepon type, reload, else print no clips!?
 
 	// movement passes, to make it smother.
@@ -81,7 +81,10 @@ public class Entity {
 	
 
 	public Entity() {
-
+		BulletClip clip = new BulletClip();
+		availableClips.add(clip);
+		clip = new BulletClip();
+		availableClips.add(clip);
 	}
 
 	void initEntity(int locationX, int locationY) throws SlickException {
