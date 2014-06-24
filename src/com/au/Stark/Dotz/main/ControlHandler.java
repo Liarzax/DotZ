@@ -6,7 +6,8 @@ import org.newdawn.slick.Input;
 
 public class ControlHandler {
 
-	private boolean downEsc = false;
+	private boolean escPressed = false;
+	private boolean wPressed = false, wHeld = false;
 	
 	/*private boolean downMinus = false;
 	private boolean debug = false;*/
@@ -24,11 +25,16 @@ public class ControlHandler {
 		checkKeys(container);
 		
 		// do stuff according to keys.
-		if(downEsc){
+		if (escPressed){
 			container.exit();
 		}
 		
-		
+		if (wHeld) {
+			
+		}
+		else if (wPressed) {
+			
+		}
 		
 	}
 
@@ -36,17 +42,27 @@ public class ControlHandler {
 		Input input = container.getInput();
 		
 		// Pressed Down / Held Down / Let Go.
-		if(input.isKeyPressed(Keyboard.KEY_ESCAPE)) {
-			downEsc = true;
+		if (input.isKeyPressed(Keyboard.KEY_ESCAPE)) {
+			escPressed = true;
 		} 
-		else if(input.isKeyDown(Keyboard.KEY_ESCAPE)) {
-			downEsc = true;
+		else if (input.isKeyDown(Keyboard.KEY_ESCAPE)) {
+			//escPressed = true;
 		} 
 		else {
-			downEsc = false;
+			escPressed = false;
 		}
 		
-		
+		// W key - (Move Up)
+		if (input.isKeyPressed(Keyboard.KEY_W)) {
+			wPressed = true;
+		} 
+		else if (input.isKeyDown(Keyboard.KEY_W)) {
+			wHeld = true;
+		} 
+		else {
+			wPressed = false;
+			wHeld = false;
+		}
 		
 	}
 	

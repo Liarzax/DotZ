@@ -3,10 +3,10 @@ DotZ
 
 Deadfence of the Zombies
 
-'-'		Toggles Debug Mode
-'='		Toggles GOD Mode
+'-'		Toggles Debug Mode.
+'='		Toggles GOD Mode.
 
-'ESC'	Key to Quit Game
+'ESC'	Key to Quit Game.
 'Arrow' Keys to Move.
 'Space' Key to Fire.
 
@@ -20,10 +20,13 @@ TODO LIST
 ==================
  - OMG To Much, Ill slowly populate this
  - 
- - Implement player/entity collisions!!!
- - Add autoFire to party AI if can see and can hit enemy
- - Add autoFire option to turn of, so AI does not autofire when toggled off (This sounds retarted).
- - fix the fire options so that the whole part is not sharing the gun, lol...
+ - Implement player/entity collisions!!! (Entity / Map Works, Entity / Entity does not work).
+ - 
+ - Encapsulate the Entity class into NPC, PC, Stuff.
+ - Fix the fire options so that the whole part is not sharing the gun, lol...
+ - Fix Party AutoFire AI/Range/Detection.
+ - Make Bullet counter work once bullets and guns fixed
+ - Make Player/Unit health counter work since its just static atm.
  - 
  
  
@@ -31,7 +34,7 @@ TODO LIST
  ==================
  - OOHHHH Jebebus, even more, ill slowly populate this to, lol
  - 
- - 
+ - Collision, Jessus, Just left it disabled for now.
  - 
  - 
  - 

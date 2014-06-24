@@ -24,7 +24,7 @@ public class Entity {
 	int centerOfSprite = 16;
 	// Temp Bounding Box Info for Testing
 	Rectangle rec = new Rectangle(curX, curY, spriteSize, spriteSize);
-	boolean dead = false, visible = true, ai = false, aiFollow = false, aiShoot = false, canRespawn = false;
+	boolean dead = false, visible = true, ai = false, aiFollow = false, aiShoot = false, aiStatusChange = false, canRespawn = false;
 	
 	/*float runSpeed = 0.8f;
 	// Base walk speed 0.05f?
@@ -304,6 +304,7 @@ public class Entity {
 			// move follow radius
 			followRadius.setCenterX(curX + centerOfSprite);
 			followRadius.setCenterY(curY + centerOfSprite);
+			// TODO move the bullet ray with entity?
 			
 						
 		}
