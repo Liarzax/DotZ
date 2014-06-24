@@ -23,7 +23,6 @@ TODO LIST
  - Implement player/entity collisions!!! (Entity / Map Works, Entity / Entity does not work).
  - 
  - Encapsulate the Entity class into NPC, PC, Stuff.
- - Fix the fire options so that the whole part is not sharing the gun, lol...
  - Fix Party AutoFire AI/Range/Detection.
  - Make Bullet counter work once bullets and guns fixed
  - Make Player/Unit health counter work since its just static atm.

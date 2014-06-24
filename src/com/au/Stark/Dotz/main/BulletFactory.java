@@ -1,5 +1,8 @@
 package com.au.Stark.Dotz.main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -7,7 +10,8 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 public class BulletFactory {
-	// TODO:
+	// TODO: Fix this class so all it should do eventuly is just handle bullets created/moving/removing
+	
 	// When add wepons/guns. Have the guns as seperate class, and it passes in thhe values such as
 	// bullet speed, max bullets, bullet fire rate, reload speed, etc to the factory to handle firing those specific bullets!
 
@@ -18,11 +22,8 @@ public class BulletFactory {
 	// firing speed controller. Possible to use game timer? or timer class?
 	int curBulletFireTimer = 0;
 	int bulletFireRate = 20;
-
-	//LinkedList<Bullet> bullets = new LinkedList<Bullet>();
-	private int curBulletsOnField = 0;
-	private int maxBullets = 10;
-	Bullet[] bullets = new Bullet[maxBullets];
+	
+	List<Bullet> bullets = new ArrayList<Bullet>();
 
 	// Misc
 	//Animation Duration
@@ -38,32 +39,31 @@ public class BulletFactory {
 	}
 
 	public void initBulletFactory() throws SlickException {
-		//Load Bullet.init/constructor, etc
 		// Could load multiple then assign bullets depending on clip in wepon? or bullets in clip? idk.
-		//Image [] movePewLR = {new Image("assets/pewLR.png"), new Image("assets/pewLR.png")};
-		//Image [] movePewUD = {new Image("assets/pewUD.png"), new Image("assets/pewUD.png")};
 		Image [] movePew = {new Image("assets/pew.png"), new Image("assets/pew.png")};
 
-		//pewLR = new Animation(movePewLR, duration, false);
-		//pewUD = new Animation(movePewUD, duration, false);
 		pew = new Animation(movePew, duration, false);
 	}
-
-	public void createBullet(Animation sprite, int x, int y, int faceingX, int faceingY) {
-		if (curBulletsOnField < maxBullets) {
+	
+	public void createBullet(Entity entity) {
+		// this should eventuly be a check to see if you have bullets, fire if not, click.
+		if (entity.clip.curBullets > 0) {
 			// Gun Fire Sound!
 			System.out.println("Bang!");
-			bullets[curBulletsOnField] = new Bullet();
-			//bullets[curBulletsOnField].setPewLR(pewLR);
-			//bullets[curBulletsOnField].setPewUD(pewUD);
-			bullets[curBulletsOnField].setPew(pew);
-			bullets[curBulletsOnField].setBulletPosX(x + (faceingX *2));
-			bullets[curBulletsOnField].setBulletPosY(y + (faceingY *2));
-			bullets[curBulletsOnField].setDirX(faceingX);
-			bullets[curBulletsOnField].setDirY(faceingY);
-
-			bullets[curBulletsOnField].exists = true;
-			curBulletsOnField++;
+			Bullet bullet = new Bullet();
+			bullet.setPew(pew);
+			// Unit Position
+			bullet.setBulletPosX((int)entity.curX + (entity.faceingX *2));
+			bullet.setBulletPosY((int)entity.curY + (entity.faceingY *2));
+			// Could have faceing, normalised then bam... easy?
+			bullet.setDirX(entity.faceingX);
+			bullet.setDirY(entity.faceingY);
+			
+			bullet.exists = true;
+			bullets.add(bullet);
+			
+			entity.clip.curBullets--;
+			//curBulletsOnField++;
 		}
 		else {
 			// Empty Clip Sound!
@@ -72,30 +72,22 @@ public class BulletFactory {
 		curBulletFireTimer = 0;
 	}
 
-	public int getCurOnField() {
-		return curBulletsOnField;
-	}
-
-	public void resetCurOnField() {
-		curBulletsOnField = 0;
-	}
-
 	// TODO: Need to change this into a link list or something, cuz this is limited and retarted!
 	public void updateBullets(MapFactory mapFactory, Entity enemies[]) {
-		for (int i = 0; i < curBulletsOnField; i++) {
+		for (int i = 0; i < bullets.size(); i++) {
+		
+			float nextX = bullets.get(i).getBulletPosX() + bullets.get(i).getDirX();
+			float nextY = bullets.get(i).getBulletPosY() + bullets.get(i).getDirY();
 			
-			if (bullets[i].exists) {
-				float nextX = bullets[i].getBulletPosX() + bullets[i].getDirX();
-				float nextY = bullets[i].getBulletPosY() + bullets[i].getDirY();
-				
-				if (!mapFactory.isBlocked(nextX, nextY) && !BulletCollision(bullets, enemies)) {
-					bullets[i].update(bulletSpeed);
-				}
-				else if (mapFactory.isBlocked(nextX, nextY)){
-					bullets[i].destroyBullet();
-					System.out.println("Wall Hit");
-				}
+			if (!mapFactory.isBlocked(nextX, nextY) && !BulletCollision(bullets, enemies)) {
+				bullets.get(i).update(bulletSpeed);
 			}
+			else if (mapFactory.isBlocked(nextX, nextY)){
+				bullets.get(i).destroyBullet();
+				System.out.println("Wall Hit");
+				bullets.remove(i);
+			}
+			
 		}
 
 		if (curBulletFireTimer < bulletFireRate) {
@@ -105,13 +97,13 @@ public class BulletFactory {
 			// Do Nothing / wait for timer before able to fire again.
 		}
 	}
-
+	
 	public void renderBullets(Graphics g, boolean debug) {
-		for (int i = 0; i < curBulletsOnField; i++) {
-			bullets[i].render();
+		for (int i = 0; i < bullets.size(); i++) {
+			bullets.get(i).render();
 			
 			if (debug) {
-				renderDebug(bullets[i], g);
+				renderDebug(bullets.get(i), g);
 			}
 		}
 	}
@@ -129,14 +121,6 @@ public class BulletFactory {
 
 	public void setBulletFireRate(int bulletFireRate) {
 		this.bulletFireRate = bulletFireRate;
-	}
-
-	public int getMaxBullets() {
-		return maxBullets;
-	}
-
-	public void setMaxBullets(int maxBullets) {
-		this.maxBullets = maxBullets;
 	}
 
 	public int getCurReloadTime() {
@@ -162,19 +146,19 @@ public class BulletFactory {
 
 
 	// TEMP 
-	// super bang collision dang!
-	public boolean BulletCollision(Bullet bullets[], Entity enemies[]) {
+	// super bang collision dang!	
+	public boolean BulletCollision(List<Bullet> bullets, Entity enemies[]) {
 		boolean collision = false;
 		// NOTE; if intersected push that shit outa the way
-		for (int b = 0; b < curBulletsOnField; b++) {
-			if (bullets[b].exists) {
+		for (int b = 0; b < bullets.size(); b++) {
+			if (bullets.get(b).exists) {
 				for (int i = 0; i < enemies.length; i++) { 
-					if(bullets[b].rec.intersects(enemies[i].rec) && !enemies[i].dead) {
+					if(bullets.get(b).rec.intersects(enemies[i].rec) && !enemies[i].dead) {
 						System.out.println("Bullet Collision? w/ Enemy " +i);
 						collision = true;
 						
 						enemies[i].getHit();
-						bullets[b].destroyBullet();
+						bullets.get(b).destroyBullet();
 					}
 				}
 			}

@@ -1,5 +1,8 @@
 package com.au.Stark.Dotz.main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -50,6 +53,11 @@ public class Entity {
 	//int mapWidth = 640, mapHeight = 480;
 	int mapWidth = 800, mapHeight = 640;
 	
+	// temp for seperate weapons handling
+	BulletClip clip = new BulletClip();
+	// multiple clips, and dif types, muah hahahaha?
+	//List<BulletClip> clips = new ArrayList<BulletClip>();
+	// then can iterate through and have a check, if clip type == wepon type, reload, else print no clips!?
 
 	// movement passes, to make it smother.
 	int pass = 0;
@@ -62,7 +70,7 @@ public class Entity {
 	int entID = 0;
 	public boolean reloading = false, bulletRayHit = false;
 	
-	// temp for shooting testing
+	// temp for AI shooting testing
 	float tempXDir1 = 0;
 	float tempXDir2 = 0;
 	float tempYDir1 = 0;

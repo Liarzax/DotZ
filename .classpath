@@ -8,5 +8,10 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="V:/Workspace/Java Libraries/lwjgl v2.9.1/lwjgl-2.9.1/native/windows"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="V:/Workspace/Java Libraries/lwjgl v2.9.1/lwjgl-2.9.1/jar/lwjgl_util.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="V:/Workspace/Java Libraries/lwjgl v2.9.1/lwjgl-2.9.1/native/windows"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

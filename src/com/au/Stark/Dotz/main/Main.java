@@ -13,7 +13,7 @@ import org.newdawn.slick.geom.Line;
 public class Main extends BasicGame {
 	// latest stuff added!
 	//added SSSSSTTTTTTUUUUUUFFFFFF!!!!!!!!!!!!!!! 
-	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 25;
+	final static int majorVersion = 0, minorVersion = 1, bugfix = 0, buildRev = 26;
 	final static String devStage = "Pre-Alpha";
 	final static String version = "v"+majorVersion+"."+minorVersion+"."+bugfix+"-"+devStage+"   build."+buildRev;
 
@@ -282,7 +282,8 @@ public class Main extends BasicGame {
 		// TODO maby a bool that is like, if automatic and is key down, bambambam, els if not just bam..... and have to press again tpo bam again. or something
 		if (input.isKeyDown(Input.KEY_SPACE) && players[activePlayer].reloading == false) {
 			if (bulletFactory.curBulletFireTimer >= bulletFactory.bulletFireRate) {
-				bulletFactory.createBullet(players[activePlayer].sprite,(int)players[activePlayer].curX + players[activePlayer].centerOfSprite, (int)players[activePlayer].curY + players[activePlayer].centerOfSprite, (int) players[activePlayer].faceingX, (int) players[activePlayer].faceingY);
+				bulletFactory.createBullet(players[activePlayer]);
+				//bulletFactory.createBullet(players[activePlayer].sprite,(int)players[activePlayer].curX + players[activePlayer].centerOfSprite, (int)players[activePlayer].curY + players[activePlayer].centerOfSprite, (int) players[activePlayer].faceingX, (int) players[activePlayer].faceingY);
 			}
 		}
 
@@ -292,14 +293,17 @@ public class Main extends BasicGame {
 			System.out.println("Unit "+activePlayer+" Reloading!");
 			players[activePlayer].reloading = true;
 		}
-		if (players[activePlayer].reloading == true) {
-			bulletFactory.increaseCurReloadTime();
-			System.out.println("Reloading Time = " + bulletFactory.getCurReloadTime());
-
-			if (bulletFactory.getCurReloadTime() >= bulletFactory.getReloadSpeed()) {
-				bulletFactory.resetCurOnField();
-				bulletFactory.resetCurReloadTime();
-				players[activePlayer].reloading = false;
+		for (int i = 0; i < players.length; i++) {
+			if (players[i].reloading == true) {
+				bulletFactory.increaseCurReloadTime();
+				System.out.println("Reloading Time = " + bulletFactory.getCurReloadTime());
+		
+				if (bulletFactory.getCurReloadTime() >= bulletFactory.getReloadSpeed()) {
+					//bulletFactory.resetCurOnField();
+					players[i].clip.curBullets = players[i].clip.maxBullets;
+					bulletFactory.resetCurReloadTime();
+					players[i].reloading = false;
+				}
 			}
 		}
 		
@@ -438,9 +442,11 @@ public class Main extends BasicGame {
 						}
 					}
 					
+					// if enemy detected and not reloading, FIRE!!
 					if (players[i].bulletRayHit && players[i].reloading == false) {
 						if (bulletFactory.curBulletFireTimer >= bulletFactory.bulletFireRate) {
-							bulletFactory.createBullet(players[i].sprite,(int)players[i].curX + players[i].centerOfSprite, (int)players[i].curY + players[i].centerOfSprite, (int) players[i].faceingX, (int) players[i].faceingY);
+							bulletFactory.createBullet(players[i]);
+							//bulletFactory.createBullet(players[i].sprite,(int)players[i].curX + players[i].centerOfSprite, (int)players[i].curY + players[i].centerOfSprite, (int) players[i].faceingX, (int) players[i].faceingY);
 						}
 						players[i].bulletRayHit = false;
 					}
